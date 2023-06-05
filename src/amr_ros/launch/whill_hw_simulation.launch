@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="robot" default="$(find amr_ros)/config"/>
+
+	<node pkg="gnd_gyrodometor" name="gnd_gyrodometor" type="gnd_gyrodometor" args="$(arg robot)/gyrodometor.conf"/>
+	<node pkg="gnd_ls_coordtf" name="gnd_urg_coordtf" type="gnd_ls_coordtf" args="$(arg robot)/ls_coordtf.conf"/>
+
+
+	<node pkg="gnd_lssmap_maker" name="gnd_lssmap_maker" type="gnd_lssmap_maker" args="$(arg robot)/lssmap_maker.conf"/>
+
+
+</launch>
+
