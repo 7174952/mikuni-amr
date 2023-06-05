@@ -1,0 +1,2 @@
+gnd_msgs/msg_waypoint_directional_named end
+float32 curvature

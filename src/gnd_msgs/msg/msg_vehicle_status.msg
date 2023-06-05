@@ -1,0 +1,9 @@
+# definition
+uint8 VEHICLE_STATE_IDLE = 0
+uint8 VEHICLE_STATE_RUN = 1
+uint8 VEHICLE_STATE_STOP_REMOTE = 2
+uint8 VEHICLE_STATE_STOP_OBSTACLE = 3
+uint8 VEHICLE_STATE_STOP_MANUAL = 4
+
+# status
+uint8 status
