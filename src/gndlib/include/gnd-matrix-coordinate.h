@@ -26,27 +26,6 @@ double __coordinate_matrix_inner_product__(
     return x1*x2 + y1*y2 + z1*z2;
 }
 
-int coordinate_convert( QGenericMatrix<4,4,double> *mt, QGenericMatrix<3,1,double> *v1, QGenericMatrix<3,1,double> *v2)
-{
-    Q_ASSERT_X(mt, "invalid", "invalid null pointer");
-    Q_ASSERT_X(v1, "invalid", "invalid null pointer");
-    Q_ASSERT_X(v2, "invalid", "invalid null pointer");
-
-    QGenericMatrix<4,1,double> ws1, ws2;
-
-    ws1(0,0) = (*v1)(0,0);
-    ws1(1,0) = (*v1)(1,0);
-    ws1(2,0) = (*v1)(2,0);
-    ws1(3,0) = 1;
-
-    ws2 = ws1 * (*mt);
-    (*v2)(0,0) = ws2(0,0);
-    (*v2)(1,0) = ws2(1,0);
-    (*v2)(2,0) = ws2(2,0);
-
-    return 0;
-}
-
 /**
  * @brief compute coordinate convert matrix
  * @param[out]  mt : cooridnate convert matix
@@ -158,6 +137,7 @@ int coordinate_converter( QGenericMatrix<4,4,double> *mt,
             (*mt)(3,3) = 1;
 
         } // <--- integrate
+        *mt = mt->transposed();
 
     } // <--- operation
     return 0;
