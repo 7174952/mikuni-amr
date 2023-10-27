@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(amr_ros)
-
 ################################
 ##  CONFIGURE THIS FILE HERE  ##
 ################################
@@ -11,11 +10,14 @@ set(ROS_DEPENDS
   sensor_msgs
   std_msgs
   gndlib
+  om_cart
+
   )
 
 set(EXTERNAL_DEPENDS
   Qt5Widgets
   Qt5PrintSupport
+  Qt5Multimedia
   #OpenCV
   )
 
@@ -23,6 +25,7 @@ set(EXTERNAL_DEPENDS_LIB
   Qt5::Widgets
   Qt5::PrintSupport
   Qt5::Core
+  Qt5::Multimedia
   #${OpenCV_LIBS}
   )
 
@@ -32,6 +35,9 @@ set(INCLUDE_DIRECTORIES
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
+
+## need this for qt auto generated headers to include!
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ###
 ###  Add Non ROS dependencies
@@ -82,7 +88,8 @@ find_package(catkin REQUIRED COMPONENTS ${ROS_DEPENDS})
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   Message1.msg
+#   om_cart_state.msg
+#   om_cart_cmd.msg
 #   Message2.msg
 # )
 
@@ -103,7 +110,7 @@ find_package(catkin REQUIRED COMPONENTS ${ROS_DEPENDS})
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs:gnd_msgs
+#   std_msgs
 # )
 
 ################################################
@@ -135,11 +142,18 @@ find_package(catkin REQUIRED COMPONENTS ${ROS_DEPENDS})
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
+#catkin_package(
+#  INCLUDE_DIRS include
+##  LIBRARIES om_cart
+#  CATKIN_DEPENDS om_modbus_master roscpp rospy std_msgs message_runtime
+##  DEPENDS system_lib
+#)
+
 catkin_package(
   INCLUDE_DIRS
     include
-  LIBRARIES
-    ${PROJECT_NAME}
+#  LIBRARIES
+#    ${PROJECT_NAME}
   CATKIN_DEPENDS
     ${ROS_DEPENDS}
   DEPENDS
@@ -152,6 +166,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+#include_directories(
+# include
+#  ${catkin_INCLUDE_DIRS}
+#)
+
 include_directories(
  include
   ${catkin_INCLUDE_DIRS}
@@ -164,10 +183,13 @@ file(GLOB HDRS
 file(GLOB SRCS
   "src/*.cpp"
 )
+file(GLOB NODES
+  "nodes/*.cpp"
+)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/amr_ros.cpp
+#   src/${PROJECT_NAME}/om_cart.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -178,7 +200,7 @@ file(GLOB SRCS
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/amr_ros_node.cpp)
+# add_executable(om_cart src/om_cart.cpp src/odom.cpp src/utils.cpp src/om_data.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -188,19 +210,49 @@ file(GLOB SRCS
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(om_cart ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
+# target_link_libraries(om_cart
 #   ${catkin_LIBRARIES}
 # )
 
+###
+### QT stuff (required if you want a GUI)
+###
+set(CMAKE_AUTOMOC ON)  #This will autogenerate qt gui stuff
+set(CMAKE_AUTORCC ON)  #this needs to be on so cmake will know what to do with QT resource Files
+
+#find_package(Qt5Widgets)
+#find_package(Qt5PrintSupport)
+#find all the qt UI stuff
+file(GLOB_RECURSE UI
+    "include/*.ui"
+)
+
+message("Adding ${PROJECT_NAME} UI files: " )
+foreach(source ${UI})
+    message("  - " ${source})
+endforeach(source)
+
+#make them into headers
+qt5_wrap_ui (UI_HDRS  ${UI})
+
+message("Generating ${PROJECT_NAME} UI Headers: " )
+foreach(source ${UI_HDRS})
+    message("  - " ${source})
+endforeach(source)
+
+###
+### compile
+###
 message("buliding ${PROJECT_NAME} node: ")
-foreach(NODE_FILE ${SRCS})
+#foreach(NODE_FILE ${NODES})
+foreach(NODE_FILE ${NODES})
   get_filename_component(NODE_NAME ${NODE_FILE} NAME_WE)
   message("  - " ${NODE_NAME})
 
-  add_executable(${NODE_NAME} ${NODE_FILE} ${HDRS} ${SRCS})
+  add_executable(${NODE_NAME} ${NODE_FILE} ${HDRS} ${SRCS} ${UI})
   add_dependencies(${NODE_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
   target_link_libraries (${NODE_NAME} ${catkin_LIBRARIES}  ${EXTERNAL_DEPENDS_LIB})
   target_include_directories(${NODE_NAME} PRIVATE "include/")
@@ -244,6 +296,9 @@ endforeach(NODE_FILE)
 #   PATTERN ".svn" EXCLUDE
 # )
 
+install(TARGETS ${NODE_LIST}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
 #   # myfile1
@@ -251,15 +306,12 @@ endforeach(NODE_FILE)
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-install(TARGETS ${NODE_LIST}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_amr_ros.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_om_cart.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
