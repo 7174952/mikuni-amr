@@ -194,7 +194,7 @@ coord_node::coord_node( const QGenericMatrix<4,4,double>* c )
   : id(coord_tree::InvalidID), depth(coord_tree::InvalidDepth), parent(coord_tree::InvalidParent)
 {
     name.clear();
-    c->transposed().copyDataTo(this->data());
+    c->copyDataTo(this->data());
 }
 
 /*
@@ -204,7 +204,7 @@ coord_node::coord_node( const coord_node* c )
   : id(coord_tree::InvalidID), depth(coord_tree::InvalidDepth), parent(coord_tree::InvalidParent)
 {
     name.clear();
-    c->transposed().copyDataTo(this->data());
+    c->copyDataTo(this->data());
 }
 
 /**
@@ -275,7 +275,7 @@ int coord_tree::add_node( const QString &n, const QString &p, const QGenericMatr
     node.depth = _tree[paridx].depth + 1;
 
     // ---> set coordinate convert mantrix
-    o->transposed().copyDataTo(node.data());
+    o->copyDataTo(node.data());
 
     // ---> set identification
     node.name = n;
@@ -309,7 +309,7 @@ int coord_tree::add_node( const QString &n, const int p, const QGenericMatrix<4,
     node.depth = _tree[paridx].depth + 1;
 
     // ---> set coordinate convert mantrix
-    o->transposed().copyDataTo(node.data());
+    o->copyDataTo(node.data());
 
     // ---> set identification
     node.name = n;
@@ -335,7 +335,7 @@ int coord_tree::set_coordinate( const int id, const QGenericMatrix<4,4,double> *
       return -1;
     }
     // set coordinate matrix
-    o->transposed().copyDataTo(_tree[paridx].data());
+    o->copyDataTo(_tree[paridx].data());
 
     return 0;
 }
@@ -354,7 +354,7 @@ int coord_tree::set_coordinate( const QString &n, const QGenericMatrix<4,4,doubl
         return -1;
     }
     // set coordinate matrix
-    o->transposed().copyDataTo(_tree[paridx].data());
+    o->copyDataTo(_tree[paridx].data());
 
     return 0;
 }
