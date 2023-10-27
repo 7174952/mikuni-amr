@@ -24,12 +24,19 @@ QGenericMatrix<4,4,double>  mat_coordtf;
 QFile        log_file;
 QTextStream  log_out;
 
+double time_watch_dog;
+bool is_init_on;
+
+
 void laserscan_Callback(const sensor_msgs::LaserScan::ConstPtr& laserscan_msg)
 {
     uint i = 0;
     uint j = 0;
     uint k = 0;
     sensor_msgs::PointCloud::_points_type::value_type ws_point;  // work space
+
+    time_watch_dog = ros::Time::now().toSec();
+    is_init_on = false;
 
     pointcloud_msg.points.clear();
     pointcloud_msg.channels[0].values.clear();
@@ -162,18 +169,6 @@ int main(int argc, char **argv)
             node_config.coordinate_origin.value[0], node_config.coordinate_origin.value[1], node_config.coordinate_origin.value[2],
             node_config.axis_vector_front.value[0], node_config.axis_vector_front.value[1], node_config.axis_vector_front.value[2],
             node_config.axis_vector_upside.value[0], node_config.axis_vector_upside.value[1], node_config.axis_vector_upside.value[2]);
-
-        ROS_INFO("    ... coordinate transform matrix:");
-        ROS_INFO("\r\n"
-                 "%.03lf %.03lf %.03lf %.03lf \r\n "
-                 "%.03lf %.03lf %.03lf %.03lf \r\n"
-                 "%.03lf %.03lf %.03lf %.03lf \r\n"
-                 "%.03lf %.03lf %.03lf %.03lf \r\n",
-                 mat_coordtf(0,0),mat_coordtf(0,1),mat_coordtf(0,2),mat_coordtf(0,3),
-                 mat_coordtf(1,0),mat_coordtf(1,1),mat_coordtf(1,2),mat_coordtf(1,3),
-                 mat_coordtf(2,0),mat_coordtf(2,1),mat_coordtf(2,2),mat_coordtf(2,3),
-                 mat_coordtf(3,0),mat_coordtf(3,1),mat_coordtf(3,2),mat_coordtf(3,3));
-        ROS_INFO("    ... ok, show matrix\n");
     }
 
     // make laserscan subscriber
@@ -245,9 +240,12 @@ int main(int argc, char **argv)
 
     }
 
+    time_watch_dog = ros::Time::now().toSec();
+    is_init_on = true;
+
     ros::Rate loop_rate(1000);
 
-    while (ros::ok())
+    while( ros::ok() && (is_init_on || (ros::Time::now().toSec() - time_watch_dog) < 2.0) )
     {
         ros::spinOnce();
 
@@ -255,7 +253,7 @@ int main(int argc, char **argv)
     }
 
     // finalize
-    ROS_INFO("---------- finalize ----------");
+    ROS_INFO("---------- ls_coordtf finalize ----------");
     if( log_file.isOpen() )
     {
         log_file.close();
