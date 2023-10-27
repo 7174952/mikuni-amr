@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	
+	<node pkg="usbio_driver" name="usb_io_node" type="usb_io_node"/>
+
+</launch>
