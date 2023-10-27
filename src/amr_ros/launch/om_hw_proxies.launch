@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node pkg="joy" name="joy_node" type="joy_node">
+        <param name="device" value="/dev/input/js0"/>
+    </node>
+<!--
+    <include file="$(find om_modbus_master)/launch/om_modbusRTU.launch"/>
+	
+    <node pkg="om_cart" name="om_cart" type="om_cart" output="screen"/>
+-->
+
+    <node pkg="om_cart" name="om_manual" type="om_manual"/>
+
+    <include file="$(find rplidar_ros)/launch/rplidar_a3.launch">
+        <arg name="cut_angle"     value="true"/>
+        <arg name="left_degrees"  value="-90"/>
+    </include>
+
+    <include file="$(find rt_usb_9axisimu_driver)/launch/rt_usb_9axisimu_driver.launch" >
+
+    </include>
+
+</launch>
+

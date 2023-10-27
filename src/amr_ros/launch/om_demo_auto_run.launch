@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot" default="$(find amr_ros)/maps"/>
+
+    <node pkg="amr_ros" name="auto_navi" type="auto_navi" args="$(arg robot)/target_list.txt" output="screen"/>
+
+</launch>

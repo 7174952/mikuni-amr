@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot" default="$(find amr_ros)/config"/>
+
+    <node pkg="icartmini_sbtp" name="trajectory_tracking" type="trajectory_tracking" output="screen"/>
+
+    <node pkg="icartmini_sbtp" name="icartmini_sbtp" type="icartmini_sbtp" args="$(arg robot)/navigation_sbtp_icartmini01.conf" output="screen"/>
+
+    <node pkg="nkm_destination_queue" name="nkm_destination_queue" type="nkm_destination_queue" args="$(arg robot)/nkm_destination_queue.conf" output="screen"/>
+
+</launch>

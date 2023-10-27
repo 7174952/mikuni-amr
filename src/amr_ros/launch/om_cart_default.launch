@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+    <include file="$(find om_modbus_master)/launch/om_modbusRTU.launch"/>
+	
+    <node pkg="om_cart" name="om_cart" type="om_cart"/>
+
+</launch>

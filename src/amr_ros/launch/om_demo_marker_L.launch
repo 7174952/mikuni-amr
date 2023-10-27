@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- icartmini param path -->
+    <arg name="robot" default="$(find amr_ros)/config"/>
+
+    <node pkg="gnd_synctimer" name="gnd_synctimer" type="gnd_synctimer" args="$(arg robot)/synctimer.conf"/>
+
+    <include file="$(find rplidar_ros)/launch/rplidar_a3.launch">
+        <arg name="cut_angle"     value="true"/>
+        <arg name="left_degrees"  value="-90"/>
+        <arg name="right_degrees" value="90"/>
+    </include>
+
+    <node pkg="gnd_ls_coordtf" name="gnd_ls_coordtf" type="gnd_ls_coordtf" args="$(arg robot)/ls_coordtf.conf"/>
+    <node pkg="gnd_particle_localizer" name="gnd_particle_localizer" type="gnd_particle_localizer" args="$(arg robot)/particle_localizer.conf"/>
+    <node pkg="gnd_lssmap_particle_evaluator" name="gnd_lssmap_particle_evaluator" type="gnd_lssmap_particle_evaluator" args="$(arg robot)/lssmap_particle_evaluator.conf"/>
+    <node pkg="gnd_visualizer" name="gnd_visualizer" type="gnd_visualizer" args="$(arg robot)/visualizer.conf"/>
+
+    <node pkg="joy" name="joy_node" type="joy_node">
+        <param name="device" value="/dev/input/js0"/>
+    </node>
+    <node pkg="hdk_waypoint_finder" name="hdk_waypoint_finder" type="hdk_waypoint_finder" args="$(arg robot)/hdk_waypoint_finder.conf"/>
+
+</launch>
