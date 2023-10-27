@@ -1,0 +1,4 @@
+string targetName
+float32 moveTheta
+---
+bool result
