@@ -30,9 +30,15 @@ ros::Publisher gyrodo_pub;
 QFile log_file;
 QTextStream log_out;
 
+double time_watch_dog;
+bool is_init_on;
+
 void vel2d_Callback(const gnd_msgs::msg_velocity2d_with_covariance_stamped::ConstPtr& vel_msg)
 {
     sensor_msgs::Imu imu_msg;
+
+    is_init_on = false;
+    time_watch_dog = ros::Time::now().toSec();
 
     if(imu_buff.copy_at_time(&imu_msg, vel_msg->header.stamp.toSec()) < 0)
     {
@@ -44,7 +50,11 @@ void vel2d_Callback(const gnd_msgs::msg_velocity2d_with_covariance_stamped::Cons
 
     cosv = qCos( gyrodo_msg.theta );
     sinv = qSin( gyrodo_msg.theta );
+#if 1
     rate = imu_msg.angular_velocity.z - offset_rate;
+#else
+    rate = vel_msg->vel_ang;
+#endif
 
     // calculate robot direction
     gyrodo_msg.header.seq++;
@@ -113,7 +123,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        std::cout << "   ... Error: node name is null, you must specify the name of this node via config item" << node_config.node_name.item.toStdString() << "\n";
+        ROS_ERROR( "   ... Error: node name is null, you must specify the name of this node via config item %s", node_config.node_name.item.toStdString().c_str());
         return -1;
     }
     ROS_INFO("    ... ok, node name is %s ",node_config.node_name.value.at(0).toStdString().c_str());
@@ -124,6 +134,8 @@ int main(int argc, char **argv)
 
     offset_rate = node_config.offset_calibration_default.value.at(0);
     time_start = ros::Time::now().toSec();
+    is_init_on = true;
+    time_watch_dog = ros::Time::now().toSec();
 
     // ---> initialize
     if( ros::ok() )
@@ -234,7 +246,7 @@ int main(int argc, char **argv)
     } // <--- initialize
 
     ros::Rate loop_rate(1000);
-    while (ros::ok())
+    while( ros::ok() && (is_init_on || (ros::Time::now().toSec() - time_watch_dog) < 2.0) )
     {
         ros::spinOnce();
 
@@ -242,7 +254,7 @@ int main(int argc, char **argv)
     }
 
     // finalize
-    ROS_INFO("---------- finalize ----------");
+    ROS_INFO("---------- gyrodometor finalize ----------");
     if( log_file.isOpen() )
     {
         log_file.close();
