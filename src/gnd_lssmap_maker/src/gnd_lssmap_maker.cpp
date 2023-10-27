@@ -53,8 +53,8 @@ QFile fp_txtlog_trajectory;
 QTextStream out_pc;
 QTextStream out_tj;
 
-double dbg_curr;
-bool dbg_flg;
+double time_watch_dog;
+bool is_init_on;
 
 void pose_Callback(const gnd_msgs::msg_pose2d_stamped::ConstPtr& msg)
 {
@@ -63,9 +63,9 @@ void pose_Callback(const gnd_msgs::msg_pose2d_stamped::ConstPtr& msg)
 
 void pointcloud_Callback(const sensor_msgs::PointCloud::ConstPtr& msg_pointcloud)
 {
-    //debug
-    dbg_curr = ros::Time::now().toSec();
-    dbg_flg = false;
+    //update time
+    time_watch_dog = ros::Time::now().toSec();
+    is_init_on = false;
 
     if(pose_buff.copy_at_time(&pose_msg, msg_pointcloud->header.stamp.toSec()) < 0)
     {
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
             // file out configuration file
             if( gnd::lssmap_maker::fwrite_node_config( fname, &node_config ) >= 0 )
             {
-              ROS_INFO(" : output sample config file %s", fname.toStdString().c_str());
+                ROS_INFO(" : output sample config file %s", fname.toStdString().c_str());
             }
             return -1;
         }
@@ -398,12 +398,12 @@ int main(int argc, char **argv)
     pose_msg_prevcollect.header.seq   = 0;
     pose_msg_prevcollect.header.stamp.fromSec( ros::Time::now().toSec() - node_config.collect_condition_time.value.at(0) );
 
-    //debug
-    dbg_flg = true;
-    dbg_curr = ros::Time::now().toSec();
+    //wait to complete
+    is_init_on = true;
+    time_watch_dog = ros::Time::now().toSec();
     // operate
     ros::Rate loop_rate(1000);
-    while( ros::ok() && (dbg_flg || (ros::Time::now().toSec() - dbg_curr) < 1.0) )
+    while( ros::ok() && (is_init_on || (ros::Time::now().toSec() - time_watch_dog) < 1.0) )
     {
         // blocking
         loop_rate.sleep();
@@ -411,66 +411,62 @@ int main(int argc, char **argv)
     }
 
     // ---> finalize
-   {
-       if( fp_txtlog_pointcloud.isOpen() )
-       {
+    {
+      if( fp_txtlog_pointcloud.isOpen() )
+      {
           fp_txtlog_pointcloud.close();
-       }
-       if( fp_txtlog_trajectory.isOpen() )
-       {
+      }
+      if( fp_txtlog_trajectory.isOpen() )
+      {
           fp_txtlog_trajectory.close();
-       }
+      }
 
-       //counting data file out
-       gnd::write_counting_map(&lssmap_counting, node_config.map_folder_path.value.at(0)+ "/");
+      //counting data file out
+      gnd::write_counting_map(&lssmap_counting, node_config.map_folder_path.value.at(0)+ "/");
+      // build bmp image (to visualize for human)
+      gnd::lssmap_t lssmap;
+      gnd::bmp8_t bmp;
+      gnd::bmp32_t bmp32;
+      QString bmp_name;
+      QString bmp32_name;
 
-       // build bmp image (to visualize for human)
-       gnd::lssmap_t lssmap;
-       gnd::bmp8_t bmp;
-       gnd::bmp32_t bmp32;
-       QString bmp_name;
-       QString bmp32_name;
+      bmp_name = node_config.map_folder_path.value.at(0) + "/" + "map-image8.bmp";
+      bmp32_name = node_config.map_folder_path.value.at(0) + "/" + "map-image32.bmp";
 
-       bmp_name = node_config.map_folder_path.value.at(0) + "/" + "map-image8.bmp";
-       bmp32_name = node_config.map_folder_path.value.at(0) + "/" + "map-image32.bmp";
-       ROS_INFO("  => create laser scan statistics map");
+      // build environmental map
+      gnd::build_map(&lssmap, &lssmap_counting, node_config.sensor_range.value.at(0), node_config.additional_smoothing_parameter.value.at(0) );
+      // make bmp image: it show the likelihood field
+      gnd::build_bmp(&bmp, &lssmap, node_config.image_map_pixel_size.value.at(0));
+      // make bmp image: it show the likelihood field
+      gnd::build_bmp(&bmp32, &lssmap, node_config.image_map_pixel_size.value.at(0));
+      // file out
+      gnd::write(bmp_name, &bmp);
+      // file out
+      gnd::write(bmp32_name, &bmp32);
+      gnd::destroy_map(&lssmap);
+      gnd::destroy_counting_map(&lssmap_counting);
 
-       // build environmental map
-       gnd::build_map(&lssmap, &lssmap_counting, node_config.sensor_range.value.at(0), node_config.additional_smoothing_parameter.value.at(0) );
-       // make bmp image: it show the likelihood field
-       gnd::build_bmp(&bmp, &lssmap, node_config.image_map_pixel_size.value.at(0));
-       // make bmp image: it show the likelihood field
-       gnd::build_bmp(&bmp32, &lssmap, node_config.image_map_pixel_size.value.at(0));
-       // file out
-       gnd::write(bmp_name, &bmp);
-       // file out
-       gnd::write(bmp32_name, &bmp32);
+      // set origin to file
+      QString fname(node_config.map_folder_path.value.at(0) + "/" + "origin.txt");
+      QFile file(fname);
+      double x, y;
+      QTextStream out_org;
 
-       gnd::destroy_map(&lssmap);
-       gnd::destroy_counting_map(&lssmap_counting);
+      if(!file.open(QIODevice::WriteOnly  | QIODevice::Text))
+      {
+          ROS_INFO("fail to open %s",fname.toStdString().c_str());
+      }
+      else
+      {
+          out_org.setDevice(&file);
+          bmp.pget_origin(&x, &y);
+          out_org << QString::asprintf("%lf %lf \n",x,y);
+          file.close();
+      }
 
-       // set origin to file
-       QString fname(node_config.map_folder_path.value.at(0) + "/" + "origin.txt");
-       QFile file(fname);
-       double x, y;
-       QTextStream out_org;
-
-       if(!file.open(QIODevice::WriteOnly  | QIODevice::Text))
-       {
-           ROS_INFO("fail to open %s",fname.toStdString().c_str());
-       }
-       else
-       {
-           out_org.setDevice(&file);
-           bmp.pget_origin(&x, &y);
-           out_org << QString::asprintf("%lf %lf \n",x,y);
-           file.close();
-       }
-
-       ROS_INFO("   ... make map image %s\n", "map-image.bmp");
-       bmp.deallocate();
-       bmp32.deallocate();
-
+      ROS_INFO("   ... make map image %s finished!\n", "map-image.bmp");
+      bmp.deallocate();
+      bmp32.deallocate();
 
     } // <--- finalize
 
