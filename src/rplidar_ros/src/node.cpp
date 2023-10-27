@@ -158,9 +158,9 @@ bool getRPLIDARDeviceInfo(ILidarDriver * drv)
     op_result = drv->getDeviceInfo(devinfo);
     if (SL_IS_FAIL(op_result)) {
         if (op_result == SL_RESULT_OPERATION_TIMEOUT) {
-            ROS_ERROR("Error, operation time out. RESULT_OPERATION_TIMEOUT! ");
+            ROS_ERROR("LIDAR:Error, operation time out. RESULT_OPERATION_TIMEOUT! ");
         } else {
-            ROS_ERROR("Error, unexpected error, code: %x",op_result);
+            ROS_ERROR("LIDAR:Error, unexpected error, code: %x",op_result);
         }
         return false;
     }
@@ -192,11 +192,11 @@ bool checkRPLIDARHealth(ILidarDriver * drv)
                 ROS_INFO("RPLidar health status : Warning.");
 				return true;
 			case SL_LIDAR_STATUS_ERROR:
-                ROS_ERROR("Error, rplidar internal error detected. Please reboot the device to retry.");
+                ROS_ERROR("LIDAR:Error, rplidar internal error detected. Please reboot the device to retry.");
 				return false;
         }
     } else {
-        ROS_ERROR("Error, cannot retrieve rplidar health code: %x", op_result);
+        ROS_ERROR("LIDAR:Error, cannot retrieve rplidar health code: %x", op_result);
         return false;
     }
 }
@@ -300,15 +300,16 @@ int main(int argc, char * argv[]) {
     else{
         _channel = *createSerialPortChannel(serial_port, serial_baudrate);
     }
+
     if (SL_IS_FAIL((drv)->connect(_channel))) {
 		if(channel_type == "tcp"){
-            ROS_ERROR("Error, cannot connect to the ip addr  %s with the tcp port %s.",tcp_ip.c_str(),std::to_string(tcp_port).c_str());
+            ROS_ERROR("LIDAR:Error, cannot connect to the ip addr  %s with the tcp port %s.",tcp_ip.c_str(),std::to_string(tcp_port).c_str());
         }
         else if(channel_type == "udp"){
-            ROS_ERROR("Error, cannot connect to the ip addr  %s with the udp port %s.",udp_ip.c_str(),std::to_string(udp_port).c_str());
+            ROS_ERROR("LIDAR:Error, cannot connect to the ip addr  %s with the udp port %s.",udp_ip.c_str(),std::to_string(udp_port).c_str());
         }
         else{
-            ROS_ERROR("Error, cannot bind to the specified serial port %s.",serial_port.c_str());            
+            ROS_ERROR("LIDAR:Error, cannot bind to the specified serial port %s.",serial_port.c_str());
         }
         delete drv;
         return -1;
@@ -347,9 +348,9 @@ int main(int argc, char * argv[]) {
             }
 
             if (selectedScanMode == sl_u16(-1)) {
-                ROS_ERROR("scan mode `%s' is not supported by lidar, supported modes:", scan_mode.c_str());
+                ROS_ERROR("LIDAR:scan mode `%s' is not supported by lidar, supported modes:", scan_mode.c_str());
                 for (std::vector<LidarScanMode>::iterator iter = allSupportedScanModes.begin(); iter != allSupportedScanModes.end(); iter++) {
-                    ROS_ERROR("\t%s: max_distance: %.1f m, Point number: %.1fK",  iter->scan_mode,
+                    ROS_ERROR("LIDAR:\t%s: max_distance: %.1f m, Point number: %.1fK",  iter->scan_mode,
                             iter->max_distance, (1000/iter->us_per_sample));
                 }
                 op_result = SL_RESULT_OPERATION_FAIL;
@@ -371,7 +372,7 @@ int main(int argc, char * argv[]) {
     }
     else
     {
-        ROS_ERROR("Can not start scan: %08x!", op_result);
+        ROS_ERROR("LIDAR:Can not start scan: %08x!", op_result);
     }
 
     ros::Time start_scan_time;

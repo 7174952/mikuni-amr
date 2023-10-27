@@ -78,7 +78,7 @@ int main(int argc, char** argv)
       }
       else
       {
-        ROS_ERROR("Data format is neither binary nor ascii.");
+        ROS_ERROR("IMU:Data format is neither binary nor ascii.");
       }
     }
 
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
         }
         else
         {
-          ROS_ERROR("readSensorData() returns false, please check your devices.\n");
+          ROS_ERROR("IMU:readSensorData() returns false, please check your devices.\n");
         }
       }
     }
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
   }
   else
   {
-    ROS_ERROR("Error opening sensor device, please re-check your devices.\n");
+    ROS_ERROR("IMU:Error opening sensor device, please re-check your devices.\n");
   }
 
   ROS_INFO("Shutting down RT imu driver complete.\n");
