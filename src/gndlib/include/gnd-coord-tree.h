@@ -195,6 +195,7 @@ coord_node::coord_node( const QGenericMatrix<4,4,double>* c )
 {
     name.clear();
     c->copyDataTo(this->data());
+
 }
 
 /*
@@ -205,6 +206,7 @@ coord_node::coord_node( const coord_node* c )
 {
     name.clear();
     c->copyDataTo(this->data());
+
 }
 
 /**
@@ -355,6 +357,7 @@ int coord_tree::set_coordinate( const QString &n, const QGenericMatrix<4,4,doubl
     }
     // set coordinate matrix
     o->copyDataTo(_tree[paridx].data());
+
 
     return 0;
 }

@@ -65,7 +65,7 @@ public:
     // ---> setter, getter
 public:
     // get pixel index
-    int pindex(const double x, const double y, qint64 *r, qint64 *c);
+    int pindex(const double x, const double y, qint64 *c, qint64 *r);
     // get pixel pointer
     T* ppointer(const double x, const double y);
     // get pixel value
@@ -96,11 +96,11 @@ public:
     double height();
 
     // get a pixel lower boundary position
-    int pget_pos_lower(const quint64 r, const quint64 c, double *x, double *y);
+    int pget_pos_lower(const quint64 c, const quint64 r, double *x, double *y);
     // get a pixel upper boundary position
-    int pget_pos_upper(const quint64 r, const quint64 c, double *x, double *y);
+    int pget_pos_upper(const quint64 c, const quint64 r, double *x, double *y);
     // get a pixel core position
-    int pget_pos_core(const quint64 r, const quint64 c, double *x, double *y);
+    int pget_pos_core(const quint64 c, const quint64 r, double *x, double *y);
     // <--- setter, getter
 
 public:
@@ -194,7 +194,7 @@ int gridplane<T>::reallocate(const double xs, const double ys)
     int tmp;
 
     // compute access index of row and column
-    if( (tmp = pindex(xs, ys, &r, &c)) == 0 )	return 0;
+    if( (tmp = pindex(xs, ys, &c, &r)) == 0 )	return 0;
 
     // reallocate
     if( (ret = basic_gridmap<T>::reallocate(r,c)) < 0 ) return ret;
@@ -220,7 +220,7 @@ int gridplane<T>::reallocate(const double xs, const double ys)
  * @param[out] c : column index
  */
 template< typename T >
-int gridplane<T>::pindex(const double x, const double y, qint64 *r, qint64 *c)
+int gridplane<T>::pindex(const double x, const double y, qint64 *c, qint64 *r)
 {
     if( !basic_gridmap<T>::is_allocate() ) return -1;
 
@@ -288,7 +288,7 @@ T* gridplane<T>::ppointer(const double x, const double y)
 {
     qint64 r, c;
 
-    if( pindex(x, y, &r, &c) < 0 ) return 0;
+    if( pindex(x, y, &c, &r) < 0 ) return 0;
 
     return basic_gridmap<T>::pointer(r, c);
 }
@@ -353,7 +353,7 @@ int gridplane<T>::pget(const double x, const double y, T* v)
     qint64 r, c;
 
     if(!v)	return -1;
-    if( pindex(x, y, &r, &c) < 0 ) return -1;
+    if( pindex(x, y, &c, &r) < 0 ) return -1;
     *v = *basic_gridmap<T>::pointer(r, c);
     return 0;
 }
@@ -369,7 +369,7 @@ int gridplane<T>::pset(const double x, const double y, const T &v)
 {
     long r = 0, c = 0;
     if(!v)	return -1;
-    for( int ret = pindex(x, y, &r, &c); ret < 0; ret = pindex(x, y, &r, &c))
+    for( int ret = pindex(x, y, &c, &r); ret < 0; ret = pindex(x, y, &c, &r))
     {
         int ret_realloc;
         if( (ret_realloc = reallocate(x,y)) < 0) return -1;
@@ -453,7 +453,7 @@ int gridplane<T>::pset_rsl(double x, double y)
  * @brief get a pixel lower bounds
  */
 template< typename T >
-int gridplane<T>::pget_pos_lower(const quint64 r, const quint64 c, double *x, double *y)
+int gridplane<T>::pget_pos_lower(const quint64 c, const quint64 r, double *x, double *y)
 {
     *x = _orgn.x() + c * _rsl.x();
     *y = _orgn.y() + r * _rsl.y();
@@ -465,9 +465,9 @@ int gridplane<T>::pget_pos_lower(const quint64 r, const quint64 c, double *x, do
  * @brief get a pixel upper bounds
  */
 template< typename T >
-int gridplane<T>::pget_pos_upper(const quint64 r, const quint64 c, double *x, double *y)
+int gridplane<T>::pget_pos_upper(const quint64 c, const quint64 r, double *x, double *y)
 {
-    pget_pos_lower(r, c, x, y);
+    pget_pos_lower(c, r, x, y);
     *x += _rsl.x();
     *y += _rsl.y();
     return 0;
@@ -478,9 +478,9 @@ int gridplane<T>::pget_pos_upper(const quint64 r, const quint64 c, double *x, do
  * @brief get a pixel core position
  */
 template< typename T >
-int gridplane<T>::pget_pos_core(const quint64 r, const quint64 c, double *x, double *y)
+int gridplane<T>::pget_pos_core(const quint64 c, const quint64 r, double *x, double *y)
 {
-    pget_pos_lower(r, c, x, y);
+    pget_pos_lower(c, r, x, y);
     *x += _rsl.x() / 2.0;
     *y += _rsl.y() / 2.0;
     return 0;

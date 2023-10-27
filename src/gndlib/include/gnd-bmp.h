@@ -54,7 +54,7 @@ struct INFOHEADER_
     int32_t			biXPixPerMeter;	  ///< pixel per meter on x-axis
     int32_t			biYPixPerMeter;	  ///< pixel per meter on y-axis
     uint32_t		biClrUsed;		    ///< number of color index
-    uint32_t		biClrImporant;	  ///< number of important color index
+    uint32_t		biClrImportant;	  ///< number of important color index
 };
 typedef struct INFOHEADER_  INFOHEADER;
 
@@ -78,10 +78,37 @@ int read( const QString &fname, bmp8_t *gm );
 int write( const QString &fname, bmp32_t *gm );
 int read( const QString &fname, bmp32_t *gm );
 
+int16_t swap(int16_t value);
+int32_t swap(int32_t value);
+uint16_t swap(uint16_t value);
+uint32_t swap(uint32_t value);
+
 } //End of namespace
 
 
 namespace gnd {
+//Swap High and low byte
+int16_t swap(int16_t value)
+{
+    return ((value & 0x00ff) << 8) + ((value >> 8) & 0x00ff);
+}
+
+int32_t swap(int32_t value)
+{
+    return ((value & 0x000000ff) << 24) + (((value >> 8) & 0x000000ff) << 16) + (((value >> 16) & 0x000000ff) << 8) + ((value >> 24) & 0x000000ff);
+}
+
+uint16_t swap(uint16_t value)
+{
+    return ((value & 0x00ff) << 8) + ((value >> 8) & 0x00ff);
+}
+
+uint32_t swap(uint32_t value)
+{
+    return ((value & 0x000000ff) << 24) + (((value >> 8) & 0x000000ff) << 16) + (((value >> 16) & 0x000000ff) << 8) + ((value >> 24) & 0x000000ff);
+}
+
+
 /**
  * @ingroup GNDBmp
  * @brief write gray bit map file
@@ -132,7 +159,7 @@ int write( const QString &fname, bmp8_t *gm)
     iheader.biXPixPerMeter = qRound( 1.0 / gm->xrsl() );
     iheader.biYPixPerMeter = qRound( 1.0 / gm->yrsl() );
     iheader.biClrUsed      = 0;
-    iheader.biClrImporant  = 0;
+    iheader.biClrImportant  = 0;
 
     { // ---> file out
         QFile file(fname);
@@ -166,7 +193,7 @@ int write( const QString &fname, bmp8_t *gm)
             << iheader.biXPixPerMeter
             << iheader.biYPixPerMeter
             << iheader.biClrUsed
-            << iheader.biClrImporant;
+            << iheader.biClrImportant;
 
         // ---> write colar pallete
         for(uint32_t i = 0; i < (1<<8); i++)
@@ -227,6 +254,9 @@ int read( const QString &fname, bmp8_t *gm)
        >> fheader.bfReserved1
        >> fheader.bfReserved2
        >> fheader.bfOffBits;
+    fheader.bfType = swap(fheader.bfType);
+    fheader.bfSize = swap(fheader.bfSize);
+    fheader.bfOffBits = swap(fheader.bfOffBits);
 
     // ---> info header
     ::memset(&iheader, 0, sizeof(iheader));
@@ -240,7 +270,18 @@ int read( const QString &fname, bmp8_t *gm)
        >> iheader.biXPixPerMeter
        >> iheader.biYPixPerMeter
        >> iheader.biClrUsed
-       >> iheader.biClrImporant;
+       >> iheader.biClrImportant;
+    iheader.biSize = swap(iheader.biSize);
+    iheader.biWidth = swap(iheader.biWidth);
+    iheader.biHeight = swap(iheader.biHeight);
+    iheader.biPlanes = swap(iheader.biPlanes);
+    iheader.biBitCount = swap(iheader.biBitCount);
+    iheader.biCompression = swap(iheader.biCompression);
+    iheader.biSizeImage = swap(iheader.biSizeImage);
+    iheader.biXPixPerMeter = swap(iheader.biXPixPerMeter);
+    iheader.biYPixPerMeter = swap(iheader.biYPixPerMeter);
+    iheader.biClrUsed = swap(iheader.biClrUsed);
+    iheader.biClrImportant = swap(iheader.biClrImportant);
 
     { // ---> set data
         uint8_t d;	// dummy
@@ -335,7 +376,7 @@ int write( const QString &fname, bmp32_t *gm)
     iheader.biXPixPerMeter = qRound( 1.0 / gm->xrsl() );
     iheader.biYPixPerMeter = qRound( 1.0 / gm->yrsl() );
     iheader.biClrUsed      = 0;
-    iheader.biClrImporant  = 0;
+    iheader.biClrImportant  = 0;
 
     { // ---> file out
         QFile file(fname);
@@ -367,7 +408,7 @@ int write( const QString &fname, bmp32_t *gm)
             << iheader.biXPixPerMeter
             << iheader.biYPixPerMeter
             << iheader.biClrUsed
-            << iheader.biClrImporant;
+            << iheader.biClrImportant;
 
         // write image data
         for( quint64 h = 0; h < (unsigned)iheader.biHeight; h++ )
@@ -418,8 +459,11 @@ int read( const QString &fname, bmp32_t *gm)
        >> fheader.bfReserved1
        >> fheader.bfReserved2
        >> fheader.bfOffBits;
+    fheader.bfType = swap(fheader.bfType);
+    fheader.bfSize = swap(fheader.bfSize);
+    fheader.bfOffBits = swap(fheader.bfOffBits);
 
-    // ---> info header
+    // info header
     ::memset(&iheader, 0, sizeof(iheader));
     in >> iheader.biSize
        >> iheader.biWidth
@@ -431,7 +475,18 @@ int read( const QString &fname, bmp32_t *gm)
        >> iheader.biXPixPerMeter
        >> iheader.biYPixPerMeter
        >> iheader.biClrUsed
-       >> iheader.biClrImporant;
+       >> iheader.biClrImportant;
+    iheader.biSize = swap(iheader.biSize);
+    iheader.biWidth = swap(iheader.biWidth);
+    iheader.biHeight = swap(iheader.biHeight);
+    iheader.biPlanes = swap(iheader.biPlanes);
+    iheader.biBitCount = swap(iheader.biBitCount);
+    iheader.biCompression = swap(iheader.biCompression);
+    iheader.biSizeImage = swap(iheader.biSizeImage);
+    iheader.biXPixPerMeter = swap(iheader.biXPixPerMeter);
+    iheader.biYPixPerMeter = swap(iheader.biYPixPerMeter);
+    iheader.biClrUsed = swap(iheader.biClrUsed);
+    iheader.biClrImportant = swap(iheader.biClrImportant);
 
     { // ---> set data
         uint8_t d;	// dummy
@@ -449,7 +504,7 @@ int read( const QString &fname, bmp32_t *gm)
         // read image data
         for( quint64 h = 0; h < (unsigned)iheader.biHeight; h++ )
         {
-            for(quint64 w = 0; h < (unsigned)iheader.biWidth; w++)
+            for(quint64 w = 0; w < (unsigned)iheader.biWidth; w++)
             {
                 if(in.atEnd()) return -2;
                 in >> *gm->pointer(h, w);

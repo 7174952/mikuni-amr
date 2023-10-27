@@ -56,7 +56,6 @@ public:
     QString name() const;
     QString value() const;
     QString comment() const;
-
 };
 
 /**
@@ -166,6 +165,7 @@ QString ConfigItem::comment() const
     return _comment;
 }
 
+
 /**
  * @brief init file handle
  * @param [in] fileName : config file name
@@ -238,7 +238,15 @@ int ConfigFile::read_from_file(const QString &fileName)
                         strTmp = itemIn.readLine().trimmed();
                         if(strTmp.at(0) == '#') continue;
                         if(strTmp.contains('}')) break; //matrix value over
-                        valueTmp.append(strTmp.split(QRegularExpression("(,|;|#| )"))[0] + ";"); //val0;val1;val2;...
+                        QStringList tmp = strTmp.split(QRegularExpression("(,|;| )"));
+                        for(const QString &s:tmp)
+                        {
+                            if((s.size() > 0) && (s.at(0) != '#'))
+                            {
+                                valueTmp.append(s + ";");
+                            }
+                        }
+                        //valueTmp.append(strTmp.split(QRegularExpression("(,|;|#| )"))[0] + ";"); //val0;val1;val2;...
 
                     } while(!itemIn.atEnd() );
 

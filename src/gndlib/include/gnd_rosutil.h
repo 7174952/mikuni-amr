@@ -20,6 +20,106 @@
 
 namespace gnd {
 
+#define gnd_sign(x)				( ((x) < 0) ? -1 : 1 )
+#define gnd_round(x)			( (int) ((x) + 0.5) )
+#define gnd_square(x)				((x) * (x))
+
+// ---> distance unit
+#define gnd_unit_mm2cm_scale	(10.0)
+#define gnd_unit_cm2mm_scale	(0.1)
+#define gnd_mm2cm(x)			((x) / gnd_unit_mm2cm_scale)
+#define gnd_cm2mm(x)			((x) * gnd_unit_mm2cm_scale)
+
+#define gnd_unit_mm2m_scale		(0.001)
+#define gnd_unit_m2mm_scale		(1000.0)
+#define gnd_mm2m(x)				((x) / gnd_unit_m2mm_scale)
+#define gnd_m2mm(x)				((x) * gnd_unit_m2mm_scale)
+
+#define gnd_unit_cm2m_scale		(0.01)
+#define gnd_unit_m2cm_scale		(100.0)
+#define gnd_cm2m(x)				((x) * gnd_unit_cm2m_scale)
+#define gnd_m2cm(x)				((x) * gnd_unit_m2cm_scale)
+
+#define gnd_unit_dist2mm_scale	gnd_unit_m2mm_scale
+#define gnd_unit_mm2dist_scale	gnd_unit_mm2m_scale
+#define gnd_unit_dist2cm_scale	gnd_unit_m2cm_scale
+#define gnd_unit_cm2dist_scale	gnd_unit_cm2m_scale
+#define gnd_unit_dist2m_scale	(1.0)
+#define gnd_unit_m2dist_scale	(1.0)
+
+#define gnd_mm2dist(x)			( (x) * gnd_unit_mm2dist_scale )
+#define gnd_dist2mm(x)			( (x) * gnd_unit_dist2mm_scale )
+#define gnd_cm2dist(x)			( (x) * gnd_unit_cm2dist_scale )
+#define gnd_dist2cm(x)			( (x) * gnd_unit_dist2cm_scale )
+#define gnd_m2dist(x)			( (x) * gnd_unit_m2dist_scale )
+#define gnd_dist2m(x)			( (x) * gnd_unit_dist2m_scale )
+// <--- distance unit
+
+// ---> angle unit
+#define gnd_unit_rad2ang_scale	( 1.0 )
+#define gnd_unit_ang2rad_scale	( 1.0 )
+#define gnd_unit_deg2ang_scale	( M_PI / 180.0 )
+#define gnd_unit_ang2deg_scale	( 180.0 / M_PI )
+#define gnd_rad2ang(x)			( (x) * gnd_unit_rad2ang_scale )
+#define gnd_ang2rad(x)			( (x) * gnd_unit_ang2rad_scale )
+#define gnd_deg2ang(x)			( (x) * gnd_unit_deg2ang_scale )
+#define gnd_ang2deg(x)			( (x) * gnd_unit_ang2deg_scale )
+
+#define gnd_unit_rad2deg_scale	( 180.0 / M_PI )
+#define gnd_unit_deg2rad_scale	( M_PI / 180.0 )
+#define gnd_rad2deg(x)			( (x) * gnd_unit_rad2deg_scale )
+#define gnd_deg2rad(x)			( (x) * gnd_unit_deg2rad_scale )
+// <--- angle unit
+
+// ---> time unit
+#define gnd_unit_sec2time_scale			(1.0)
+#define gnd_unit_time2sec_scale			(1.0)
+#define gnd_unit_msec2time_scale		(1.0e-3)
+#define gnd_unit_time2msec_scale		(1.0e+3)
+#define gnd_unit_usec2time_scale		(1.0e-6)
+#define gnd_unit_time2usec_scale		(1.0e+6)
+#define gnd_unit_nsec2time_scale		(1.0e-9)
+#define gnd_unit_time2nsec_scale		(1.0e+9)
+
+#define gnd_sec2time(x)			((x) * gnd_unit_sec2time_scale )
+#define gnd_time2sec(x)			((x) * gnd_unit_time2sec_scale )
+#define gnd_msec2time(x)		((x) * gnd_unit_msec2time_scale )
+#define gnd_time2msec(x)		((x) * gnd_unit_time2msec_scale )
+#define gnd_usec2time(x)		((x) * gnd_unit_usec2time_scale )
+#define gnd_time2usec(x)		((x) * gnd_unit_time2usec_scale )
+#define gnd_nsec2time(x)		((x) * gnd_unit_nsec2time_scale )
+#define gnd_time2nsec(x)		((x) * gnd_unit_time2nsec_scale )
+
+#define gnd_unit_sec2msec_scale		(1.0e+3)
+#define gnd_unit_sec2usec_scale		(1.0e+6)
+#define gnd_unit_sec2nsec_scale		(1.0e+9)
+#define gnd_unit_msec2sec_scale		(1.0e-3)
+#define gnd_unit_msec2usec_scale	(1.0e+3)
+#define gnd_unit_msec2nsec_scale	(1.0e+6)
+#define gnd_unit_usec2sec_scale		(1.0e-6)
+#define gnd_unit_usec2msec_scale	(1.0e-3)
+#define gnd_unit_usec2nsec_scale	(1.0e+3)
+#define gnd_unit_nsec2sec_scale		(1.0e-9)
+#define gnd_unit_nsec2msec_scale	(1.0e-6)
+#define gnd_unit_nsec2usec_scale	(1.0e-3)
+
+#define gnd_sec2msec(x)			((x)*gnd_unit_sec2msec_scale)
+#define gnd_sec2usec(x)			((x)*gnd_unit_sec2usec_scale)
+#define gnd_sec2nsec(x)			((x)*gnd_unit_sec2nsec_scale)
+#define gnd_msec2sec(x)			((x)*gnd_unit_msec2sec_scale)
+#define gnd_msec2usec(x)		((x)*gnd_unit_msec2usec_scale)
+#define gnd_msec2nsec(x)		((x)*gnd_unit_msec2nsec_scale)
+#define gnd_usec2sec(x)			((x)*gnd_unit_usec2sec_scale)
+#define gnd_usec2msec(x)		((x)*gnd_unit_usec2msec_scale)
+#define gnd_usec2nsec(x)		((x)*gnd_unit_usec2nsec_scale)
+#define gnd_nsec2sec(x)			((x)*gnd_unit_nsec2sec_scale)
+#define gnd_nsec2msec(x)		((x)*gnd_unit_nsec2msec_scale)
+#define gnd_nsec2usec(x)		((x)*gnd_unit_nsec2usec_scale)
+// <--- time unit
+
+#define gnd_loop_period(cur, st, cyc) (  floor( (cur - st) / cyc ) )
+#define gnd_loop_next(cur, st, cyc)  (  st + (gnd_loop_period(cur, st, cyc) + 1) * cyc )
+
 /**
  * @ingroup GNDUtil
  * @def
@@ -28,7 +128,7 @@ namespace gnd {
  */
 double rad_normalize(double x)
 {
-  return ( x - ( ( qFloor((x + M_PI ) / (2 * M_PI) ) ) * (2 * M_PI)));
+    return ( x - ( ( qFloor((x + M_PI ) / (2 * M_PI) ) ) * (2 * M_PI)));
 }
 
 
