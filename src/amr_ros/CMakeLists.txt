@@ -11,14 +11,13 @@ set(ROS_DEPENDS
   std_msgs
   gndlib
   om_cart
-
   )
 
 set(EXTERNAL_DEPENDS
   Qt5Widgets
   Qt5PrintSupport
   Qt5Multimedia
-  #OpenCV
+  OpenCV
   )
 
 set(EXTERNAL_DEPENDS_LIB
@@ -26,11 +25,6 @@ set(EXTERNAL_DEPENDS_LIB
   Qt5::PrintSupport
   Qt5::Core
   Qt5::Multimedia
-  #${OpenCV_LIBS}
-  )
-
-set(INCLUDE_DIRECTORIES
-  #${OpenCV_LIBS}
   )
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -174,7 +168,7 @@ catkin_package(
 include_directories(
  include
   ${catkin_INCLUDE_DIRS}
-  ${INCLUDE_DIRECTORIES}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 file(GLOB HDRS
@@ -254,7 +248,7 @@ foreach(NODE_FILE ${NODES})
 
   add_executable(${NODE_NAME} ${NODE_FILE} ${HDRS} ${SRCS} ${UI})
   add_dependencies(${NODE_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-  target_link_libraries (${NODE_NAME} ${catkin_LIBRARIES}  ${EXTERNAL_DEPENDS_LIB})
+  target_link_libraries (${NODE_NAME} ${catkin_LIBRARIES}  ${EXTERNAL_DEPENDS_LIB} ${OpenCV_LIBRARIES})
   target_include_directories(${NODE_NAME} PRIVATE "include/")
 
   list(APPEND NODE_LIST ${NODE_NAME})
