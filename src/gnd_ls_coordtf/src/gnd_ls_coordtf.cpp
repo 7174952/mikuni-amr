@@ -24,19 +24,12 @@ QGenericMatrix<4,4,double>  mat_coordtf;
 QFile        log_file;
 QTextStream  log_out;
 
-double time_watch_dog;
-bool is_init_on;
-
-
 void laserscan_Callback(const sensor_msgs::LaserScan::ConstPtr& laserscan_msg)
 {
     uint i = 0;
     uint j = 0;
     uint k = 0;
     sensor_msgs::PointCloud::_points_type::value_type ws_point;  // work space
-
-    time_watch_dog = ros::Time::now().toSec();
-    is_init_on = false;
 
     pointcloud_msg.points.clear();
     pointcloud_msg.channels[0].values.clear();
@@ -240,12 +233,9 @@ int main(int argc, char **argv)
 
     }
 
-    time_watch_dog = ros::Time::now().toSec();
-    is_init_on = true;
-
     ros::Rate loop_rate(1000);
 
-    while( ros::ok() && (is_init_on || (ros::Time::now().toSec() - time_watch_dog) < 2.0) )
+    while( ros::ok() )
     {
         ros::spinOnce();
 
