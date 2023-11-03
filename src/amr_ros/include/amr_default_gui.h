@@ -32,7 +32,9 @@
 #include "std_msgs/ByteMultiArray.h"
 #include "std_msgs/Bool.h"
 #include "gnd_msgs/msg_vehicle_status.h"
+#include "gnd_msgs/msg_pose2d_stamped.h"
 
+#define gnd_rad2deg(x)			( (x) * ( 180.0 / M_PI ) )
 
 namespace Ui {
 class Amr_Default_Gui;
@@ -63,6 +65,7 @@ public:
   void targetArrivedCallback(const std_msgs::Bool::ConstPtr& msg);
   void lidar_callback(const sensor_msgs::LaserScan::ConstPtr& msg);
   void imu_callback(const sensor_msgs::Imu::ConstPtr& msg);
+  void pose_Callback(const gnd_msgs::msg_pose2d_stamped::ConstPtr& msg);
   void enable_all_buttons();
   void setup_log();
   void save_log(QString str);
@@ -75,6 +78,9 @@ public:
 private:
   void show_message(QString msg);
   void check_alarm_state();
+
+  /*-PI < theta < PIに調整する*/
+  double trans_q(double theta);
 
 private slots:
   void spinOnce();
@@ -235,6 +241,9 @@ private:
       QString vel_theta;
       QString vel_left;
       QString vel_right;
+      QString pose_x;
+      QString pose_y;
+      QString pose_theta;
       QString emergen_stop;
       QString bat_volt;
       QString bat_total_curr;
@@ -389,6 +398,7 @@ private:
   ros::Subscriber lidar_sub;
   ros::Subscriber imu_sub;
   ros::Publisher om_cmd_pub;
+  ros::Subscriber pose_sub;
   //usb-io ros info
   ros::Subscriber usbio_status_sub;
   ros::Publisher usbio_cmd_pub;
@@ -405,6 +415,9 @@ private:
       "vel_theta(rad/s)",
       "vel_left(m/s)",
       "vel_right(m/s)",
+      "pose_x(m)",
+      "pose_y(m)",
+      "pose_theta(deg)",
       "emergen_stop",
       "bat_volt(V)",
       "bat_total_curr(A)",

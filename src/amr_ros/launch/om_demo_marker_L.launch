@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- icartmini param path -->
+    <!-- param path -->
     <arg name="robot" default="$(find amr_ros)/config"/>
-
+<!--
     <node pkg="gnd_synctimer" name="gnd_synctimer" type="gnd_synctimer" args="$(arg robot)/synctimer.conf"/>
+-->
 
     <include file="$(find rplidar_ros)/launch/rplidar_a3.launch">
         <arg name="cut_angle"     value="true"/>

@@ -1,5 +1,7 @@
 #include "amr_default_gui.h"
 #include "ui_amr_default_gui.h"
+#include "opencv2/opencv.hpp"
+#include "qcustomplot.h"
 
 Amr_Default_Gui::Amr_Default_Gui(QWidget *parent) : QWidget(parent), ui(new Ui::Amr_Default_Gui)
 {
@@ -44,6 +46,7 @@ Amr_Default_Gui::Amr_Default_Gui(QWidget *parent) : QWidget(parent), ui(new Ui::
     lidar_sub = nh.subscribe<sensor_msgs::LaserScan>("scan", 100, &Amr_Default_Gui::lidar_callback, this);
     imu_sub = nh.subscribe<sensor_msgs::Imu>("imu/data_raw", 100, &Amr_Default_Gui::imu_callback, this);
     om_cmd_pub = nh.advertise<om_cart::om_cart_cmd>("cart_cmd",10);
+    pose_sub = nh.subscribe<gnd_msgs::msg_pose2d_stamped>("pose_particle_localizer", 10, &Amr_Default_Gui::pose_Callback, this);
 
     //setup usbio ros info
     usbio_process = new QProcess(this);
@@ -294,9 +297,11 @@ void Amr_Default_Gui::save_running_data()
     QTextStream outFile(&running_data_file);
 
     log_run_info.rec_time = QString::number((QTime::currentTime().msecsSinceStartOfDay() - log_start_time.msecsSinceStartOfDay()) / 1000.0);
-    outFile << log_run_info.rec_time << ";" << log_run_info.vel_line << ";";
-    outFile << log_run_info.vel_theta << ";" << log_run_info.vel_left << ";";
-    outFile << log_run_info.vel_right << ";" << log_run_info.emergen_stop << ";";
+    outFile << log_run_info.rec_time << ";";
+    outFile << log_run_info.vel_line << ";" << log_run_info.vel_theta << ";";
+    outFile << log_run_info.vel_left << ";" << log_run_info.vel_right << ";";
+    outFile << log_run_info.pose_x << ";"   << log_run_info.pose_y << ";" ;
+    outFile << log_run_info.pose_theta << ";" << log_run_info.emergen_stop << ";";
     outFile << log_run_info.bat_volt << ";" << log_run_info.bat_total_curr << ";";
     outFile << log_run_info.bat_curr_left << ";" << log_run_info.bat_curr_right << ";";
     outFile << log_run_info.alarm_info << ";" << log_run_info.alert_info << ";" << "\r\n";
@@ -822,6 +827,23 @@ void Amr_Default_Gui::set_usb_port(uint8_t num, uint8_t val)
     }
 
     usbio_cmd_pub.publish(msg_pub);
+}
+
+double Amr_Default_Gui::trans_q(double theta)
+{
+    while (theta > M_PI)
+        theta -= 2.0 * M_PI;
+    while (theta < -M_PI)
+        theta += 2.0 * M_PI;
+
+    return theta;
+}
+
+void Amr_Default_Gui::pose_Callback(const gnd_msgs::msg_pose2d_stamped::ConstPtr& msg)
+{
+    log_run_info.pose_x = QString::number(msg->x,'f',3);
+    log_run_info.pose_y = QString::number(msg->y,'f',3);
+    log_run_info.pose_theta = QString::number(gnd_rad2deg(trans_q(msg->theta)),'f',2);
 }
 
 void Amr_Default_Gui::amrStatusCallback(const gnd_msgs::msg_vehicle_status::ConstPtr& status)
