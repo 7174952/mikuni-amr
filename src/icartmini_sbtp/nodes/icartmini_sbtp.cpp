@@ -618,7 +618,6 @@ int main(int argc, char **argv)
             // ---> planning
             if( time_current > schedule_planning )
             {
-                double pointcloud_stamp = time_current;
                 double length_current_path;
                 double cos_on_current_pathend, sin_on_current_pathend;
                 gnd::path::trajectory_unit_t traj_tmp;
