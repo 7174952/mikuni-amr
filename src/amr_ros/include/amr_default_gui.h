@@ -115,6 +115,9 @@ private slots:
 
   void on_pushButton_set_s_on_clicked();
 
+signals:
+  void sendPose(double,double,double);
+
 private:
   enum
   {
