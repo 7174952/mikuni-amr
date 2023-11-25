@@ -9,3 +9,8 @@ icartminiシステムから改良：GUI増強、地図生成GUI化、地図・�
 3.corrected matrix functions
 
 4.Add gui operating fuction
+
+#2023/11/25
+1. fixed gndlib
+2. add amr_status: running status GUI
+3. make map OK/ show running status NG
