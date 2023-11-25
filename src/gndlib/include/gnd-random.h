@@ -31,6 +31,13 @@ int sqnorm(const QVector<double> *vec,  double *v);
 
 inline
 int inner_prod(const QVector<double> *m1, const QVector<double> *m2, double *sum);
+
+/*
+ * @brief generate randam value [0;1] with uniform probability
+ */
+inline
+double random_uniform( void );
+
 /*
  * @brief generate random value following a gaussian distribution (box-muller method)
  */
@@ -78,7 +85,8 @@ int sqnorm(const QVector<double> *vec,  double *v)
     return 0;
 }
 
-inline int inner_prod(const QVector<double> *m1, const QVector<double> *m2, double *sum)
+inline
+int inner_prod(const QVector<double> *m1, const QVector<double> *m2, double *sum)
 {
     Q_ASSERT_X(m1 && m2, "null", "null pointer");
     Q_ASSERT_X((m1->size() == m2->size()), "invalid", "vector size invalid");
@@ -116,6 +124,12 @@ int assign_to_as_vector ( QVector<double> *dest, VCT *src, const size_t r, const
     return 0;
 }
 
+inline
+double random_uniform()
+{
+    return QRandomGenerator::global()->generateDouble();
+}
+
 /**
  * @brief generate random value following a gaussian distribution (box-muller method)
  * @param [in] sigma : standard deviation
@@ -127,8 +141,8 @@ double random_gaussian(const double sigma)
 
     do
     {
-      x = - 1 + 2 * QRandomGenerator::global()->generateDouble();
-      y = - 1 + 2 * QRandomGenerator::global()->generateDouble();
+        x = - 1 + 2 * random_uniform();
+        y = - 1 + 2 * random_uniform();
 
       r = x * x + y * y;
     } while( (r > 1.0) || (r == 0) );

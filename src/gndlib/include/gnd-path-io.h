@@ -7,7 +7,6 @@
  *  Updated by ryu, 2023/10/11
  *  .Use Qt v5.14 lib to update path information
  */
-
 #ifndef GND_PATH_IO_H
 #define GND_PATH_IO_H
 
@@ -52,7 +51,7 @@ namespace gnd {
 namespace gnd {
 	namespace path {
 
-		inline
+    inline
     int fread(const char* fname, path_net_speed_limited *net)
     {
         const int GET_DEFAULT   = 0;
@@ -227,7 +226,7 @@ namespace gnd {
 		}
 
 
-		inline
+    inline
     int fwrite(const char* fname, path_net_speed_limited *net)
     {
         QFile file(fname);
@@ -280,7 +279,7 @@ namespace gnd {
 namespace gnd {
 	namespace path {
 
-		inline
+    inline
     int fread(const char* fname, path_net_area_and_speed_limited *net)
     {
         const int GET_DEFAULT   = 0;
@@ -465,7 +464,7 @@ namespace gnd {
 		}
 
 
-		inline
+    inline
     int fwrite(const char* fname, path_net_area_and_speed_limited *net)
     {
         QFile file(fname);

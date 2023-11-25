@@ -120,6 +120,7 @@ public:
  * @brief constructor
  */
 template< typename T >
+inline
 gridplane<T>::gridplane() : basic_gridmap<T>()
 {
 
@@ -129,6 +130,7 @@ gridplane<T>::gridplane() : basic_gridmap<T>()
  * @brief destructor
  */
 template< typename T >
+inline
 gridplane<T>::~gridplane()
 {
 
@@ -144,6 +146,7 @@ gridplane<T>::~gridplane()
  * @param yrsl : y component resolution
  */
 template< typename T >
+inline
 int gridplane<T>::pallocate(const double xs, const double ys, const double xrsl, const double yrsl)
 {
     unsigned long r, c;
@@ -167,6 +170,7 @@ int gridplane<T>::pallocate(const double xs, const double ys, const double xrsl,
  * @brief deallocate
  */
 template< typename T >
+inline
 int gridplane<T>::deallocate()
 {
     int ret;
@@ -187,6 +191,7 @@ int gridplane<T>::deallocate()
  * @param[in] ys : requiring y component size
  */
 template< typename T >
+inline
 int gridplane<T>::reallocate(const double xs, const double ys)
 {
     qint64 r = 0, c = 0;
@@ -197,14 +202,16 @@ int gridplane<T>::reallocate(const double xs, const double ys)
     if( (tmp = pindex(xs, ys, &c, &r)) == 0 )	return 0;
 
     // reallocate
-    if( (ret = basic_gridmap<T>::reallocate(r,c)) < 0 ) return ret;
+     if( (ret = basic_gridmap<T>::reallocate(r,c)) < 0 ) return ret;
 
     // adjust origin
-    if( c < 0 ){
-      _orgn.rx() -= _rsl.x() * ::qCeil( qAbs((double)c) / basic_gridmap<T>::_unit.x() ) * basic_gridmap<T>::_unit.x();
+    if( c < 0 )
+    {
+        _orgn.rx() -= _rsl.x() * qAbs(c);
     }
-    if( r < 0 ){
-      _orgn.ry() -= _rsl.y() * ::qCeil( qAbs((double)r) / basic_gridmap<T>::_unit.y() ) * basic_gridmap<T>::_unit.y();
+    if( r < 0 )
+    {
+        _orgn.ry() -= _rsl.y() * qAbs(r);
     }
 
     // <---------------------------------------- allocator, deallocator
@@ -220,6 +227,7 @@ int gridplane<T>::reallocate(const double xs, const double ys)
  * @param[out] c : column index
  */
 template< typename T >
+inline
 int gridplane<T>::pindex(const double x, const double y, qint64 *c, qint64 *r)
 {
     if( !basic_gridmap<T>::is_allocate() ) return -1;
@@ -242,6 +250,7 @@ int gridplane<T>::pindex(const double x, const double y, qint64 *c, qint64 *r)
  * @param[in] y : y component value
  */
 template< typename T >
+inline
 int gridplane<T>::pset_core(const double x, const double y)
 {
     _orgn.rx() = x - (basic_gridmap<T>::column() * _rsl.x()) / 2.0;
@@ -256,6 +265,7 @@ int gridplane<T>::pset_core(const double x, const double y)
  * @param[in] y : y component value
  */
 template< typename T >
+inline
 int gridplane<T>::pset_origin(const double x, const double y)
 {
     _orgn.rx() = x;
@@ -270,6 +280,7 @@ int gridplane<T>::pset_origin(const double x, const double y)
  * @param[out] y : y component value
  */
 template< typename T >
+inline
 int gridplane<T>::pget_origin(double *x, double *y)
 {
     *x = _orgn.x();
@@ -284,6 +295,7 @@ int gridplane<T>::pget_origin(double *x, double *y)
  * @return 0 : not exit
  */
 template< typename T >
+inline
 T* gridplane<T>::ppointer(const double x, const double y)
 {
     qint64 r, c;
@@ -300,6 +312,7 @@ T* gridplane<T>::ppointer(const double x, const double y)
  * @return pixel's value
  */
 template< typename T >
+inline
 T gridplane<T>::pvalue(const double x, const double y)
 {
     return *ppointer(x, y);
@@ -309,6 +322,7 @@ T gridplane<T>::pvalue(const double x, const double y)
  * @brief x lower bound
  */
 template< typename T >
+inline
 double gridplane<T>::xlower()
 {
     return _orgn.x();
@@ -318,6 +332,7 @@ double gridplane<T>::xlower()
  * @brief x upper bound
  */
 template< typename T >
+inline
 double gridplane<T>::xupper()
 {
     return _orgn.x() + basic_gridmap<T>::column() * _rsl.x();
@@ -327,6 +342,7 @@ double gridplane<T>::xupper()
  * @brief y lower bound
  */
 template< typename T >
+inline
 double gridplane<T>::ylower()
 {
     return _orgn.y();
@@ -336,6 +352,7 @@ double gridplane<T>::ylower()
  * @brief y upper bound
  */
 template< typename T >
+inline
 double gridplane<T>::yupper()
 {
     return _orgn.y() + basic_gridmap<T>::row() * _rsl.y();
@@ -348,6 +365,7 @@ double gridplane<T>::yupper()
  * @param[out] v : pixel's value
  */
 template< typename T >
+inline
 int gridplane<T>::pget(const double x, const double y, T* v)
 {
     qint64 r, c;
@@ -365,6 +383,7 @@ int gridplane<T>::pget(const double x, const double y, T* v)
  * @param[in] v : pixel's value
  */
 template< typename T >
+inline
 int gridplane<T>::pset(const double x, const double y, const T &v)
 {
     long r = 0, c = 0;
@@ -382,6 +401,7 @@ int gridplane<T>::pset(const double x, const double y, const T &v)
  * @brief x resolution
  */
 template< typename T >
+inline
 double gridplane<T>::xrsl()
 {
     return _rsl.x();
@@ -391,6 +411,7 @@ double gridplane<T>::xrsl()
  * @brief y resolution
  */
 template< typename T >
+inline
 double gridplane<T>::yrsl()
 {
     return _rsl.y();
@@ -401,6 +422,7 @@ double gridplane<T>::yrsl()
  * @brief origin's x component vlaue
  */
 template< typename T >
+inline
 double gridplane<T>::xorg()
 {
     return _orgn.x();
@@ -411,6 +433,7 @@ double gridplane<T>::xorg()
  * @brief origin's y component vlaue
  */
 template< typename T >
+inline
 double gridplane<T>::yorg()
 {
     return _orgn.y();
@@ -421,6 +444,7 @@ double gridplane<T>::yorg()
  * @brief plane widith
  */
 template< typename T >
+inline
 double gridplane<T>::width()
 {
     return _rsl.x() * basic_gridmap<T>::column();
@@ -431,6 +455,7 @@ double gridplane<T>::width()
  * @brief plane height
  */
 template< typename T >
+inline
 double gridplane<T>::height()
 {
     return _rsl.y() * basic_gridmap<T>::row();
@@ -441,6 +466,7 @@ double gridplane<T>::height()
  * @brief set resolution
  */
 template< typename T >
+inline
 int gridplane<T>::pset_rsl(double x, double y)
 {
     _rsl.rx() = x;
@@ -453,6 +479,7 @@ int gridplane<T>::pset_rsl(double x, double y)
  * @brief get a pixel lower bounds
  */
 template< typename T >
+inline
 int gridplane<T>::pget_pos_lower(const quint64 c, const quint64 r, double *x, double *y)
 {
     *x = _orgn.x() + c * _rsl.x();
@@ -465,6 +492,7 @@ int gridplane<T>::pget_pos_lower(const quint64 c, const quint64 r, double *x, do
  * @brief get a pixel upper bounds
  */
 template< typename T >
+inline
 int gridplane<T>::pget_pos_upper(const quint64 c, const quint64 r, double *x, double *y)
 {
     pget_pos_lower(c, r, x, y);
@@ -478,6 +506,7 @@ int gridplane<T>::pget_pos_upper(const quint64 c, const quint64 r, double *x, do
  * @brief get a pixel core position
  */
 template< typename T >
+inline
 int gridplane<T>::pget_pos_core(const quint64 c, const quint64 r, double *x, double *y)
 {
     pget_pos_lower(c, r, x, y);
@@ -494,6 +523,7 @@ int gridplane<T>::pget_pos_core(const quint64 c, const quint64 r, double *x, dou
  * @param[in] fname : file name
  */
 template< typename T >
+inline
 int gridplane<T>::fwrite(const QString fname)
 {
     QFile file(fname);
@@ -510,8 +540,10 @@ int gridplane<T>::fwrite(const QString fname)
     // save file tag
     out.writeRawData(&__GridPlaneFileTag__[0],__GridPlaneTagSize);
     // file header
+
+    out.setByteOrder(QDataStream::LittleEndian); //bmp data format: littleEndian
     out << basic_gridmap<T>::_unit.y() << basic_gridmap<T>::_unit.x() << basic_gridmap<T>::_plane.y() << basic_gridmap<T>::_plane.x();
-    out << _orgn.y() << _orgn.x() << _rsl.y() << _rsl.x();
+    out << _orgn.x() << _orgn.y() << _rsl.x() << _rsl.y();
 
     uint64_t r, c;
     for(r = 0; r < basic_gridmap<T>::_map_data.size(); r++)
@@ -532,6 +564,7 @@ int gridplane<T>::fwrite(const QString fname)
  * @param[in] fname : file name
  */
 template< typename T >
+inline
 int gridplane<T>::fread(const QString fname)
 {
     QFile file(fname);
@@ -556,8 +589,9 @@ int gridplane<T>::fread(const QString fname)
     }
 
     //Read map size
+    in.setByteOrder(QDataStream::LittleEndian); //bmp data format: LittleEndian
     in >> basic_gridmap<T>::_unit.ry() >> basic_gridmap<T>::_unit.rx() >> basic_gridmap<T>::_plane.ry() >> basic_gridmap<T>::_plane.rx();
-    in >> _orgn.ry() >> _orgn.rx() >> _rsl.ry() >> _rsl.rx();
+    in >> _orgn.rx() >> _orgn.ry() >> _rsl.rx() >> _rsl.ry();
 
     //Create data buffer
     if(basic_gridmap<T>::allocate(basic_gridmap<T>::_plane.y()*basic_gridmap<T>::_unit.y(), basic_gridmap<T>::_plane.x()*basic_gridmap<T>::_unit.x()) < 0)

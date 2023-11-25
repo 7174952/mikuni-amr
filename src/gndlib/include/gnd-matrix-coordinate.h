@@ -19,6 +19,7 @@ namespace gnd
 namespace matrix
 {
 
+inline
 double __coordinate_matrix_inner_product__(
     const double x1, const double y1, const double z1,
     const double x2, const double y2, const double z2 )
@@ -39,6 +40,7 @@ double __coordinate_matrix_inner_product__(
  * @param[in] zaxy : y element of z-axis unit vector
  * @param[in] zaxz : z element of z-axis unit vector
  */
+inline
 int coordinate_converter( QGenericMatrix<4,4,double> *mt,
     const double x,    const double y,    const double z,
     const double xaxx, const double xaxy, const double xaxz,
@@ -151,6 +153,7 @@ int coordinate_converter( QGenericMatrix<4,4,double> *mt,
  * @return ==0 : success
  * @return  <0 : fail
  */
+inline
 int _det_4x4_( QGenericMatrix<4,4,double> *mt, double *v)
 {
   *v =  (*mt)(0,0) *
@@ -185,6 +188,7 @@ int _det_4x4_( QGenericMatrix<4,4,double> *mt, double *v)
  * @return ==1 :
  * @return  <0 : fail
  */
+inline
 int _inverse_4x4_( QGenericMatrix<4,4,double> *mt, QGenericMatrix<4,4,double> *inv)
 {
     double det;

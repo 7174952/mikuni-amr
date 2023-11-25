@@ -126,6 +126,7 @@ namespace gnd {
  * @brief normalization of angle
  * @return -pi <= ret < pi
  */
+inline
 double rad_normalize(double x)
 {
     return ( x - ( ( qFloor((x + M_PI ) / (2 * M_PI) ) ) * (2 * M_PI)));
@@ -151,6 +152,7 @@ public:
     int16_t push(const T &msg);
     int16_t copy_at_time(T *dest, double query);
     int nlatest();
+    void resize(uint size);
 
 };
 
@@ -160,6 +162,7 @@ public:
  * @return     : -
  */
 template<typename T>
+inline
 data_buff<T>::data_buff()
 {
     length_ = 0;
@@ -174,6 +177,7 @@ data_buff<T>::data_buff()
  * @return     : -
  */
 template<typename T>
+inline
 data_buff<T>::data_buff(uint32_t maxsize)
 {
     msgs_.resize(maxsize);
@@ -184,11 +188,19 @@ data_buff<T>::data_buff(uint32_t maxsize)
 }
 
 template<typename T>
+inline
 data_buff<T>::~data_buff()
 {
 
 }
 
+template<typename T>
+inline
+void data_buff<T>::resize(uint size)
+{
+    msgs_.resize(size);
+    length_ = size;
+}
 /**
  * @brief Save data to buffer
  * @param [in] msg : message for saving
@@ -196,6 +208,7 @@ data_buff<T>::~data_buff()
  *           >=0 : success
  */
 template<typename T>
+inline
 int16_t data_buff<T>::push(const T &msg)
 {
     int i;
@@ -213,6 +226,7 @@ int16_t data_buff<T>::push(const T &msg)
  * \brief get sequential serial number of latest
  */
 template<typename T>
+inline
 int data_buff<T>::nlatest()
 {
     return n_;
@@ -226,6 +240,7 @@ int data_buff<T>::nlatest()
  *           >=0 : success
  */
 template<typename T>
+inline
 int16_t data_buff<T>::copy_at_time(T *dest, double query)
 {
     uint32_t h = header_;

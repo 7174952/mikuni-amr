@@ -92,7 +92,7 @@ public:
 
 namespace gnd {
 
-
+inline
 ConfigItem::ConfigItem()
 {
     _item = "";
@@ -106,6 +106,7 @@ ConfigItem::ConfigItem()
  * @param [in] value : value of item
  * @param [in] comment : comment of item
  */
+inline
 ConfigItem::ConfigItem(const QString &name, const QString &value, const QString &comment)
 {
     _item = name;
@@ -113,6 +114,7 @@ ConfigItem::ConfigItem(const QString &name, const QString &value, const QString 
     _comment = comment;
 }
 
+inline
 ConfigItem::~ConfigItem()
 {
 
@@ -126,6 +128,7 @@ ConfigItem::~ConfigItem()
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int ConfigItem::get(QString *pname, QString *pvalue, QString *pcomment) const
 {
     *pname = _item;
@@ -142,6 +145,7 @@ int ConfigItem::get(QString *pname, QString *pvalue, QString *pcomment) const
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int ConfigItem::set(const QString &name, const QString &value, const QString &comment)
 {
     _item = name;
@@ -150,16 +154,19 @@ int ConfigItem::set(const QString &name, const QString &value, const QString &co
     return 0;
 }
 
+inline
 QString ConfigItem::name() const
 {
     return _item;
 }
 
+inline
 QString ConfigItem::value() const
 {
     return _value;
 }
 
+inline
 QString ConfigItem::comment() const
 {
     return _comment;
@@ -171,11 +178,13 @@ QString ConfigItem::comment() const
  * @param [in] fileName : config file name
  * @return   : -
  */
+inline
 ConfigFile::ConfigFile()
 {
 
 }
 
+inline
 ConfigFile::~ConfigFile()
 {
     if(file.exists())
@@ -190,6 +199,7 @@ ConfigFile::~ConfigFile()
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int ConfigFile::read_from_file(const QString &fileName)
 {
     file.setFileName(fileName);
@@ -273,6 +283,7 @@ int ConfigFile::read_from_file(const QString &fileName)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::get_param(Param<double> *dest)
 {
     for(const ConfigItem &item_tmp : qConfigItems)
@@ -309,6 +320,7 @@ int32_t ConfigFile::get_param(Param<double> *dest)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::get_param(Param<QString> *dest)
 {
     for(const ConfigItem &item_tmp : qConfigItems)
@@ -338,6 +350,7 @@ int32_t ConfigFile::get_param(Param<QString> *dest)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::get_param(Param<bool> *dest)
 {
     for(const ConfigItem &item_tmp : qConfigItems)
@@ -378,6 +391,7 @@ int32_t ConfigFile::get_param(Param<bool> *dest)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::set_param(const Param<QString> &src)
 {
     bool exist = false;
@@ -413,6 +427,7 @@ int32_t ConfigFile::set_param(const Param<QString> &src)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::set_param(const Param<double> &src)
 {
     bool exist = false;
@@ -449,6 +464,7 @@ int32_t ConfigFile::set_param(const Param<double> &src)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::set_param(const Param<bool> &src,uint type)
 {
     bool exist = false;
@@ -497,6 +513,7 @@ int32_t ConfigFile::set_param(const Param<bool> &src,uint type)
  * @return    <0 : fail
  *           >=0 : success
  */
+inline
 int32_t ConfigFile::write_to_file(QString fileName)
 {
     //check old file status

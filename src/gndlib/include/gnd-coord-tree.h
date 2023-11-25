@@ -8,7 +8,6 @@
  *  .Use Qt v5.14 lib to instead of original Matrix class
  *
  ***************************************/
-
 #ifndef GND_COORD_TREE_H
 #define GND_COORD_TREE_H
 
@@ -113,6 +112,7 @@ namespace gnd
  * @return    < 0 : fail to find node(f or t)
  */
 template< typename T1, typename T2>
+inline
 int coord_tree::get_convert_matrix(const T1& f, const T2& t, QGenericMatrix<4,4,double> *m )
 {
     QGenericMatrix<4,4,double> fconv;
@@ -181,6 +181,7 @@ namespace gnd {
 /**
  * @brief constructor
  */
+inline
 coord_node::coord_node()
   : id(coord_tree::InvalidID), depth(coord_tree::InvalidDepth), parent(coord_tree::InvalidParent)
 {
@@ -190,6 +191,7 @@ coord_node::coord_node()
 /*
  * @brief copy constructor
  */
+inline
 coord_node::coord_node( const QGenericMatrix<4,4,double>* c )
   : id(coord_tree::InvalidID), depth(coord_tree::InvalidDepth), parent(coord_tree::InvalidParent)
 {
@@ -201,6 +203,7 @@ coord_node::coord_node( const QGenericMatrix<4,4,double>* c )
 /*
  * @brief copy constructor
  */
+inline
 coord_node::coord_node( const coord_node* c )
   : id(coord_tree::InvalidID), depth(coord_tree::InvalidDepth), parent(coord_tree::InvalidParent)
 {
@@ -212,6 +215,7 @@ coord_node::coord_node( const coord_node* c )
 /**
  * @brief destructor
  */
+inline
 coord_node::~coord_node()
 {
 
@@ -221,6 +225,7 @@ coord_node::~coord_node()
 /**
  * @brief constructor
  */
+inline
 coord_tree::coord_tree()
 {
     initial();
@@ -229,6 +234,7 @@ coord_tree::coord_tree()
 /**
  * @brief destructor
  */
+inline
 coord_tree::~coord_tree()
 {
 
@@ -237,6 +243,7 @@ coord_tree::~coord_tree()
 /**
  * @brief initialize
  */
+inline
 void coord_tree::initial()
 {
     node_t root;
@@ -263,6 +270,7 @@ void coord_tree::initial()
  * @return    <0 : fail to node addition
  *           >=0 : added node id
  */
+inline
 int coord_tree::add_node( const QString &n, const QString &p, const QGenericMatrix<4,4,double> *o )
 {
     node_t node;
@@ -297,6 +305,7 @@ int coord_tree::add_node( const QString &n, const QString &p, const QGenericMatr
  * @return    <0 : fail to node addition
  *           >=0 : added node id
  */
+inline
 int coord_tree::add_node( const QString &n, const int p, const QGenericMatrix<4,4,double> *o )
 {
     node_t node;
@@ -329,6 +338,7 @@ int coord_tree::add_node( const QString &n, const int p, const QGenericMatrix<4,
  * @param [in] o : cooridnate matrix
  * @return    <0 : fail to find node
  */
+inline
 int coord_tree::set_coordinate( const int id, const QGenericMatrix<4,4,double> *o )
 {
     int paridx;
@@ -348,6 +358,7 @@ int coord_tree::set_coordinate( const int id, const QGenericMatrix<4,4,double> *
  * @param [in] o : cooridnate matrix
  * @return    <0 : fail to find node
  */
+inline
 int coord_tree::set_coordinate( const QString &n, const QGenericMatrix<4,4,double> *o )
 {
     int paridx;
@@ -368,6 +379,7 @@ int coord_tree::set_coordinate( const QString &n, const QGenericMatrix<4,4,doubl
  * @return   >=0 : node index
  * @return    <0 : fail to find node
  */
+inline
 int coord_tree::find(const QString &n)
 {
     uint64_t i;
@@ -384,6 +396,7 @@ int coord_tree::find(const QString &n)
  * @return    >=0 : node index
  * @return     <0 : fail to find node
  */
+inline
 int coord_tree::find(const int id)
 {
     uint64_t i;
@@ -398,6 +411,7 @@ int coord_tree::find(const int id)
  * @brief get node id
  * @param [in] n : name
  */
+inline
 int coord_tree::get_node_id(const QString &n)
 {
     int i = find(n);

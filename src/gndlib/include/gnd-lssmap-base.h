@@ -6,7 +6,6 @@
  *  Updated by ryu, 2023/5/16
  *  .Use Qt v5.14 lib to update map functions
  */
-
 #ifndef GND_LSSMAP_BASE_H
 #define GND_LSSMAP_BASE_H
 
@@ -139,6 +138,7 @@ namespace gnd
  * @param[in]  p : pixel size
  * @param[in]  u : grid map allocate unit size
  */
+inline
 int init_counting_map(cmap_t *m, double p, double u)
 {
     Q_ASSERT_X(m, "invalid", "invalid null pointer");
@@ -181,6 +181,7 @@ int init_counting_map(cmap_t *m, double p, double u)
  * @brief clear counting map
  * @param[out] m :
  */
+inline
 int clear_counting_map(cmap_t *m)
 {
     Q_ASSERT_X(m, "invalid", "invalid null pointer");
@@ -201,6 +202,7 @@ int clear_counting_map(cmap_t *m)
  * @brief release counting map
  * @param[out] m : counting map
  */
+inline
 int destroy_counting_map(cmap_t *m)
 {
     Q_ASSERT_X(m, "invalid", "invalid null pointer");
@@ -224,6 +226,7 @@ int destroy_counting_map(cmap_t *m)
  * @param[in] x : laser scanner reflection point x
  * @param[in] y : laser scanner reflection point y
  */
+inline
 int counting_map(cmap_t *m, double x, double y)
 {
     Q_ASSERT_X(m, "invalid", "invalid null argument");
@@ -270,6 +273,7 @@ int counting_map(cmap_t *m, double x, double y)
     return 0;
 }
 
+inline
 int inverse2x2(QGenericMatrix<2,2,double> &m1, QGenericMatrix<2,2,double> *m2)
 {
     double det = m1(0,0)*m1(1,1) - m1(0,1)*m1(1,0);
@@ -294,6 +298,7 @@ int inverse2x2(QGenericMatrix<2,2,double> &m1, QGenericMatrix<2,2,double> *m2)
  * @param[in]    blur :
  * @param[in]      np :
  */
+inline
 int build_map(lssmap_t *map, cmap_t *cnt, double sr, uint32_t alpha, double blur, uint64_t np )
 {
     Q_ASSERT_X(cnt, "invalid", "invalid null pointer");
@@ -552,6 +557,7 @@ int build_map(lssmap_t *map, cmap_t *cnt, double sr, uint32_t alpha, double blur
  * @brief destory map
  * @param[out] m :  map
  */
+inline
 int destroy_map(lssmap_t *m)
 {
     Q_ASSERT_X(m, "invalid", "invalid null pointer");
@@ -573,6 +579,7 @@ int destroy_map(lssmap_t *m)
  * @param[in]  pg : position gain
  * @param[out]  l : likelihood
  */
+inline
 int likelihood(lssmap_t *map, double x, double y, double *l)
 {
     Q_ASSERT_X(l, "invalid", "invalid null pointer");
@@ -634,6 +641,7 @@ int likelihood(lssmap_t *map, double x, double y, double *l)
  * @param[in]   maxr : sensor range
  * @param[out]     l : likelihood
  */
+inline
 int likelihood(bmp32_t *m, double sx, double sy, double stheta, double r, double maxr, double *l)
 {
     Q_ASSERT_X(l, "invalid", "invalid null pointer");
@@ -687,6 +695,7 @@ int likelihood(bmp32_t *m, double sx, double sy, double stheta, double r, double
  * @param[in]   maxr : sensor range
  * @param[out]     l : likelihood
  */
+inline
 int likelihood(bmp8_t *m, double sx, double sy, double stheta, double r, double maxr, double *l)
 {
     Q_ASSERT_X(l, "invalid", "invalid null pointer");
@@ -737,7 +746,7 @@ int likelihood(bmp8_t *m, double sx, double sy, double stheta, double r, double 
  * @param[in] f : file name template
  * @param[in] e : extention
  */
-//int read_counting_map(cmap_t *c,  const char* d, const char* f, const char* e)
+inline
 int read_counting_map(cmap_t *c,  const QString &d, const QString &f, const QString &e)
 {
     Q_ASSERT_X(c, "invalid", "invalid null argument");
@@ -767,7 +776,7 @@ int read_counting_map(cmap_t *c,  const QString &d, const QString &f, const QStr
  * @param[in] f : file name template
  * @param[in] e : extention
  */
-//int write_counting_map(cmap_t *c,  const char* d, const char* f, const char* e)
+inline
 int write_counting_map(cmap_t *c,  const QString &d, const QString &f, const QString &e)
 {
     Q_ASSERT_X(c, "invalid", "invalid null argument");
@@ -797,6 +806,7 @@ int write_counting_map(cmap_t *c,  const QString &d, const QString &f, const QSt
  * @param[in] sr   : sensor range (for smoothing)
  * @param[in] cp   : contrast parameter
  */
+inline
 int build_bmp(bmp8_t *bmp, lssmap_t *map, double ps, double sr, double cp)
 {
     Q_ASSERT_X(bmp, "invalid", "invalid null argument");
@@ -910,6 +920,7 @@ int build_bmp(bmp8_t *bmp, lssmap_t *map, double ps, double sr, double cp)
  * @param[in] sr   : sensor range (for smoothing)
  * @param[in] cp   : contrast parameter
  */
+inline
 int build_bmp(bmp32_t *bmp, lssmap_t *map, double ps, double sr, double cp)
 {
 

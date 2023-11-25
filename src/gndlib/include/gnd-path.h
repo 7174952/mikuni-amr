@@ -391,23 +391,23 @@ namespace gnd
   {
 
 		// ---> route class member function
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::clear()
     {
         net_.clear();
         return 0;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::n_waypoints()
     {
         return net_.size();
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::add_waypoint(const char *name, double x, double y)
     {
         path_unit_list_with_property_t<PathProp> wap;
@@ -424,11 +424,11 @@ namespace gnd
         } // <--- set
 
         return n_waypoints();
-		}
+    }
 
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::erase_waypoint(const char *name)
     {
         int i, j;
@@ -450,11 +450,11 @@ namespace gnd
         }
 
         return n_waypoints();
-		}
+    }
 
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::set_waypoint(const char *name, double x, double y)
     {
         int i, j;
@@ -483,11 +483,10 @@ namespace gnd
         }
 
         return i;
-		}
+    }
 
-
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::get_waypoint(const char *name, double *x, double *y)
     {
         int i;
@@ -497,10 +496,10 @@ namespace gnd
         if(x) *x = net_[i].waypoint.x;
         if(y) *y = net_[i].waypoint.y;
         return i;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::rename_waypoint(const char *name, const char *new_name)
     {
         int i, j;
@@ -522,10 +521,10 @@ namespace gnd
             }
         }
         return i;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::add_linepath(const char *from, const char *to, PathProp *prop)
     {
         int i, f, t;
@@ -552,19 +551,19 @@ namespace gnd
         net_[f].list.push_back(p);
 
         return 0;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::add_linepath_bidirectional(const char *a, const char *b, PathProp *prop)
     {
         if( add_linepath(a,b,prop) < 0 )	return -1;
         if( add_linepath(b,a,prop) < 0 )	return -1;
         return 0;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::erase_path(const char *from, const char *to)
     {
         int f, t;
@@ -581,39 +580,39 @@ namespace gnd
             }
         }
         return 0;
-		}
-		template <class PathProp>
-		inline
+    }
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::erase_path_bidirectional(const char *a, const char *b)
     {
         erase_path(a, b);
         erase_path(b, a);
         return 0;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::get_path_property(const char *from, const char *to, PathProp *prop)
     {
         path_unit_t *pu;
         if( (pu = pointer_path_unit(from, to)) == 0 ) return -1;
         *prop = pu->prop;
         return 0;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::set_path_property(const char *from, const char *to, PathProp *prop)
     {
         path_unit_t *pu;
         if( (pu = pointer_path_unit(from, to)) == 0 ) return -1;
         pu->prop = *prop;
         return 0;
-		}
+    }
 
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::name_waypoint(int index, char *name) const
     {
         if( index < 0 || index >= net_.size() ) return -1;
@@ -621,11 +620,11 @@ namespace gnd
 
         strcpy(name, net_[0 + index].waypoint.name);
         return 0;
-		}
+    }
 
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::index_waypoint( const char *name_waypoint ) const
     {
         int i;
@@ -641,10 +640,10 @@ namespace gnd
         }
 
         return i;
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::copy_path_unit(path_unit_with_property_t<PathProp> *dest, const char *from, const char *to)
     {
         const path_unit_with_property_t<PathProp> *p;
@@ -655,11 +654,11 @@ namespace gnd
 
         memcpy(dest, p, sizeof(path_unit_with_property_t<PathProp>) );
         return 0;
-		}
+    }
 
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::copy_path_list(path_with_property_t<PathProp> *dest, const char *waypoint)
     {
         const path_with_property_t<PathProp> *p;
@@ -670,22 +669,20 @@ namespace gnd
 
         *dest = *p;
         return 0;
-		}
+    }
 
-
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     const path_with_property_t<PathProp>* path_net_with_property<PathProp>::cosnt_pointer_path_list( const char *waypoint ) const
     {
         int i;
         if ( (i = index_waypoint(waypoint)) < 0) return 0;
-//        return net_.constBegin() + i;
         return &net_[i];
 
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     const path_unit_with_property_t<PathProp>* path_net_with_property<PathProp>::const_pointer_path_unit(const char *from, const char *to)
     {
         int i, j;
@@ -699,24 +696,21 @@ namespace gnd
         {
             return 0;
         }
-//        return net_[i].list.constBegin() + j;
         return &net_[i].list[j];
-		}
+    }
 
-
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     path_unit_list_with_property_t<PathProp>* path_net_with_property<PathProp>::pointer_path_list( const char *waypoint )
     {
         int i;
         if ( (i = index_waypoint(waypoint)) < 0) return 0;
-//        return net_.begin() + i;
         return &net_[i];
 
-		}
+    }
 
-		template <class PathProp>
-		inline
+    template <class PathProp>
+    inline
     path_unit_with_property_t<PathProp>* path_net_with_property<PathProp>::pointer_path_unit(const char *from, const char *to)
     {
         int i, j;
@@ -730,14 +724,13 @@ namespace gnd
         {
             return 0;
         }
-//        return net_[i].list.begin() + j;
         return &net_[i].list[j];
-		}
+    }
 
 
-		// ---> search path
-		template <class PathProp>
-		inline
+    // ---> search path
+    template <class PathProp>
+    inline
     int path_net_with_property<PathProp>::find_path_dijkstra( path_with_property_t<PathProp>* p, const char *start, const char *dest)
     {
         int i_start;
