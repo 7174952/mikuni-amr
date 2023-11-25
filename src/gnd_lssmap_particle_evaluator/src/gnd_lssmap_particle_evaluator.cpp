@@ -25,6 +25,7 @@
 #include "gnd_particle_localizer/msg_particle_weights_stamped.h"
 #include "gnd_lssmap_particle_evaluator_config.h"
 #include "gnd-bmp.h"
+#include "gnd-random.h"
 
 struct
 {
@@ -233,7 +234,6 @@ int main(int argc, char **argv)
     ros::NodeHandle			           nh;					           // ros nodehandle
     ros::Subscriber			           pointcloud_sub;		     // point-cloud subscriber
     ros::Subscriber			           particle_sub;		       // particle subscriber
-    ros::ServiceClient             get_synctime_sevClient;
 
     int phase = 0;
     ROS_INFO("---------- initialization ----------");
@@ -292,7 +292,7 @@ int main(int argc, char **argv)
                 y = strList.at(0).toDouble();
 
                 map.pset_origin(x, y);
-                map.fwrite("load.bmp");
+                gnd::write("load.bmp",&map);
 
                 // set out of map value
                 value_out_of_map = 0;
@@ -300,15 +300,15 @@ int main(int argc, char **argv)
                 {
                     int j;
                     //sampling from end of map
-                    j = (map.row() * (1.0 - DBL_EPSILON)) * QRandomGenerator::global()->generateDouble();
+                    j = (map.row() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
                     value_out_of_map += *map.pointer(j,0); //map.pvalue(j, 0);
 
-                    j = (map.row() * (1.0 - DBL_EPSILON)) * QRandomGenerator::global()->generateDouble();
+                    j = (map.row() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
                     value_out_of_map += *map.pointer(j, map.column() - 1); //map.pvalue(j, map.row() - 1);
 
-                    j = (map.column() * (1.0 - DBL_EPSILON)) * QRandomGenerator::global()->generateDouble();
+                    j = (map.column() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
                     value_out_of_map += *map.pointer(0, j); //map.pvalue(0, j);
-                    j = (map.column() * (1.0 - DBL_EPSILON)) * QRandomGenerator::global()->generateDouble();
+                    j = (map.column() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
                     value_out_of_map += *map.pointer(map.row() - 1, j);//map.pvalue(map.column() - 1, j);
                 }
                 value_out_of_map /= (4 * 100);
@@ -357,15 +357,6 @@ int main(int argc, char **argv)
             ROS_INFO("    ... ok");
         }
     } // <--- make point-cloud subscriber
-
-#if 0 //time synchronization
-    // ---> make service client for time synchronization
-    if( ros::ok() && node_config.service_name_get_synctimer.value.at(0) && node_config.period_time_synchronize.value > 0)
-    {
-        ROS_INFO(" => %d. create service client for time synchronization\n", ++phase );
-        get_synctime_sevClient = nh.serviceClient<gnd_synctimer::srv_get_synctime>(node_config.service_name_get_synctimer.value);
-    }// --->make service client for time synchronization
-#endif
 
     // ---> make particle weights publisher
     if( ros::ok() )
