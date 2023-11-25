@@ -13,6 +13,8 @@ int main(int argc, char **argv)
   w.set_serial_info();
   w.start_om_cart();
   w.start_usbio_board();
-  w.showMaximized();
+  w.showNormal();
+
+
   return a.exec();
 }
