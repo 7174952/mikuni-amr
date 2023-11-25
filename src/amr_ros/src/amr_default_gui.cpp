@@ -844,6 +844,8 @@ void Amr_Default_Gui::pose_Callback(const gnd_msgs::msg_pose2d_stamped::ConstPtr
     log_run_info.pose_x = QString::number(msg->x,'f',3);
     log_run_info.pose_y = QString::number(msg->y,'f',3);
     log_run_info.pose_theta = QString::number(gnd_rad2deg(trans_q(msg->theta)),'f',2);
+
+    emit sendPose(msg->x,msg->y,msg->theta);
 }
 
 void Amr_Default_Gui::amrStatusCallback(const gnd_msgs::msg_vehicle_status::ConstPtr& status)
