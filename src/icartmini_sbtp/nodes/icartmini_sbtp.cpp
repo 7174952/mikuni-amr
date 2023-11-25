@@ -26,7 +26,6 @@
 #include "gnd-matrix-coordinate.h"
 #include "gnd-coord-tree.h"
 #include "gnd_rosutil.h"
-#include "gnd-random.h"
 #include "gnd-path-io.h"
 
 #include "gnd_msgs/msg_path_area_and_speed_limited.h"
