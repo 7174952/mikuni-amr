@@ -1,6 +1,0 @@
-#No. 	TargetName 	Stop2TurnAngle(deg) 	WaitTime(minute)
-1;002;0;0;
-2;003;0;0;
-3;004;0;0;
-5;000;180;0;
-
