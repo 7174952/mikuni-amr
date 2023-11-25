@@ -9,4 +9,7 @@
 
     <node pkg="nkm_destination_queue" name="nkm_destination_queue" type="nkm_destination_queue" args="$(arg robot)/nkm_destination_queue.conf" output="screen"/>
 
+    <node pkg="amr_status" name="amr_status" type="amr_status" output="screen"/>
+
+
 </launch>

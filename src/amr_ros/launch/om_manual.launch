@@ -5,12 +5,6 @@
         <param name="device" value="/dev/input/js0"/>
     </node>
 
-<!--
-	<include file="$(find om_modbus_master)/launch/om_modbusRTU.launch"/>
-	
-	<node pkg="om_cart" name="om_cart" type="om_cart" output="screen"/>
--->
-
     <node pkg="om_cart" name="om_manual" type="om_manual"/>
 
 </launch>
