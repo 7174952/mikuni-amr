@@ -50,11 +50,7 @@ void vel2d_Callback(const gnd_msgs::msg_velocity2d_with_covariance_stamped::Cons
 
     cosv = qCos( gyrodo_msg.theta );
     sinv = qSin( gyrodo_msg.theta );
-#if 1
     rate = imu_msg.angular_velocity.z - offset_rate;
-#else
-    rate = vel_msg->vel_ang;
-#endif
 
     // calculate robot direction
     gyrodo_msg.header.seq++;
