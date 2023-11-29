@@ -161,7 +161,7 @@ void particle_weights_Callback(const gnd_particle_localizer::msg_particle_weight
 
         for( i = 0; i < msg_particles.poses.size(); i++ )
         {
-            double rand = gnd::random_gaussian(1.0); // the sum of weights is equal 1.0
+            double rand = gnd::random_uniform(); // the sum of weights is equal 1.0
             double sum = 0;
 
             // select a particle according to weight liner probability
@@ -181,7 +181,7 @@ void particle_weights_Callback(const gnd_particle_localizer::msg_particle_weight
             } // <--- set a new particle
 
             { // ---> set systematic error ratio
-                if( node_config.probability_change_systematic_motion_error.value.at(0) < gnd::random_gaussian(1.0) )
+                if( node_config.probability_change_systematic_motion_error.value.at(0) < gnd::random_uniform() )
                 {
                     // not change
                     systematic_error_ratio_depened_on_translate[i] = copy_syserr[j];
