@@ -149,6 +149,11 @@ void pointcloud_Callback(const sensor_msgs::PointCloud::ConstPtr& msg_pointcloud
             log_likelihood_max = msg_particle_weights.weights[i] > log_likelihood_max ? msg_particle_weights.weights[i] : log_likelihood_max;
         }// <--- particles scanning loop ( calculate log likelihood  )
 
+        for(uint i = 0; i < msg_particle_weights.weights.size(); i++)
+        {
+            msg_particle_weights.weights[i] = qExp(msg_particle_weights.weights[i] - log_likelihood_max) + FLT_EPSILON;
+        }
+
         // set evaluated particles sequence id
         msg_particle_weights.seq_particles = msg_particle.header.seq;
 
@@ -289,7 +294,7 @@ int main(int argc, char **argv)
             else
             {
                 x = strList.at(0).toDouble();
-                y = strList.at(0).toDouble();
+                y = strList.at(1).toDouble();
 
                 map.pset_origin(x, y);
                 gnd::write("load.bmp",&map);
@@ -301,15 +306,16 @@ int main(int argc, char **argv)
                     int j;
                     //sampling from end of map
                     j = (map.row() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
-                    value_out_of_map += *map.pointer(j,0); //map.pvalue(j, 0);
+                    value_out_of_map += *map.pointer(j,0);
 
                     j = (map.row() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
-                    value_out_of_map += *map.pointer(j, map.column() - 1); //map.pvalue(j, map.row() - 1);
+                    value_out_of_map += *map.pointer(j, map.column() - 1);
 
                     j = (map.column() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
-                    value_out_of_map += *map.pointer(0, j); //map.pvalue(0, j);
+                    value_out_of_map += *map.pointer(0, j);
                     j = (map.column() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
-                    value_out_of_map += *map.pointer(map.row() - 1, j);//map.pvalue(map.column() - 1, j);
+                    value_out_of_map += *map.pointer(map.row() - 1, j);
+
                 }
                 value_out_of_map /= (4 * 100);
                 ROS_INFO("   ... ok, output \"load.bmp\" to confirm the load map");
