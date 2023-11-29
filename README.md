@@ -14,3 +14,8 @@ icartminiシステムから改良：GUI増強、地図生成GUI化、地図・�
 1. fixed gndlib
 2. add amr_status: running status GUI
 3. make map OK/ show running status NG
+
+#2023/11/29
+1.自己位置推定不具合解消した
+2.地図上からPARTICLE重み計算不具合解消した
+3.自律走行OK
