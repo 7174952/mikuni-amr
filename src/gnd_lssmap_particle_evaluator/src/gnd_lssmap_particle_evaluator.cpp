@@ -297,7 +297,7 @@ int main(int argc, char **argv)
                 y = strList.at(1).toDouble();
 
                 map.pset_origin(x, y);
-                gnd::write("load.bmp",&map);
+                gnd::write("./load.bmp",&map);
 
                 // set out of map value
                 value_out_of_map = 0;
@@ -313,6 +313,7 @@ int main(int argc, char **argv)
 
                     j = (map.column() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
                     value_out_of_map += *map.pointer(0, j);
+
                     j = (map.column() * (1.0 - DBL_EPSILON)) * gnd::random_uniform();
                     value_out_of_map += *map.pointer(map.row() - 1, j);
 
