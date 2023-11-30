@@ -26,6 +26,17 @@ static uint __GridMapTagSize__ = sizeof(__GridMapFileTag__);
 static uint __GridPlaneTagSize = sizeof(__GridPlaneFileTag__);
 
 /**
+ * @ingroup GNDGridMap
+ * @brief index of pixel
+ */
+typedef struct pixelindex {
+    /// @brief row index
+    uint32_t row;
+    /// @brief column index
+    uint32_t column;
+} PixelIndex;
+
+/**
  * @brief statistics counting map
  */
 struct counting_map_pixel
@@ -73,9 +84,9 @@ protected:
     /// @brief map data storage
     QVector<QVector<T> > _map_data;
     /// @brief number of memory unit
-    QPoint _unit;
+    PixelIndex _unit;
     /// @brief number of plane
-    QPoint _plane;
+    PixelIndex _plane;
 
 public:
     virtual int allocate(const uint64_t r, const uint64_t c);
@@ -132,10 +143,11 @@ template <typename T>
 inline
 basic_gridmap<T>::basic_gridmap()
 {
-    _unit.setX(0);
-    _unit.setY(0);
-    _plane.setX(0);
-    _plane.setY(0);
+    _unit.row     = 0;
+    _unit.column  = 0;
+    _plane.row    = 0;
+    _plane.column = 0;
+
     _map_data.clear();
 }
 
@@ -159,7 +171,7 @@ int basic_gridmap<T>::allocate(const uint64_t r, const uint64_t c)
 
     _map_data.resize(r);
     if(_map_data.size() != r)	return -1;
-    _unit.setY(r);
+    _unit.row = r;
 
     for(uint i = 0; i < _map_data.size(); i++)
     {
@@ -170,10 +182,10 @@ int basic_gridmap<T>::allocate(const uint64_t r, const uint64_t c)
             return -1;
         }
     }
-    _unit.setX(c);
+    _unit.column = c;
 
-    _plane.setY(1);
-    _plane.setX(1);
+    _plane.row = 1;
+    _plane.column = 1;
 
     return 0;
 }
@@ -185,7 +197,7 @@ template <typename T>
 inline
 bool basic_gridmap<T>::is_allocate()
 {
-    return (_map_data.size() && _plane.y() && _plane.x());
+    return (_map_data.size() && _plane.row && _plane.column);
 
 }
 
@@ -199,10 +211,10 @@ int basic_gridmap<T>::deallocate()
     if(!is_allocate())	return -1;
 
     _map_data.clear();
-    _unit.setY(0);
-    _unit.setX(0);
-    _plane.setY(0);
-    _plane.setX(0);
+    _unit.row     = 0;
+    _unit.column  = 0;
+    _plane.row    = 0;
+    _plane.column = 0;
 
     return 0;
 }
@@ -214,7 +226,7 @@ template< typename T >
 inline
 uint64_t basic_gridmap<T>::row() const
 {
-    return _unit.y();
+    return _unit.row;
 }
 
 /**
@@ -224,7 +236,7 @@ template< typename T >
 inline
 uint64_t basic_gridmap<T>::column() const
 {
-    return _unit.x();
+    return _unit.column;
 }
 
 /**
@@ -281,8 +293,8 @@ int basic_gridmap<T>::reallocate(const int64_t sr, const int64_t sc)
     }
 
     //set new size
-    _unit.setY(npr + row());
-    _unit.setX(npc + column());
+    _unit.row = npr + row();
+    _unit.column = npc + column();
 
     return 0;
 }
@@ -302,8 +314,8 @@ T* basic_gridmap<T>::pointer(const ulong r, const ulong c)
     {
       uint32_t ur, uc;
 
-      ur = r % _unit.y();
-      uc = c % _unit.x();
+      ur = r % _unit.row;
+      uc = c % _unit.column;
       return (&_map_data[ur][uc]);
     }
 }
@@ -316,7 +328,7 @@ template< typename T >
 inline
 uint32_t basic_gridmap<T>::memory_unit_row(ulong r)
 {
-    return r / _unit.y();
+    return r / _unit.row;
 }
 
 /**
@@ -327,7 +339,7 @@ template< typename T >
 inline
 uint32_t basic_gridmap<T>::memory_unit_column(ulong c)
 {
-    return c / _unit.x();
+    return c / _unit.column;
 }
 
 /**
@@ -337,7 +349,7 @@ template< typename T >
 inline
 uint32_t basic_gridmap<T>::_unit_row_()
 {
-    return _unit.y();
+    return _unit.row;
 }
 
 /**
@@ -347,7 +359,7 @@ template< typename T >
 inline
 uint32_t basic_gridmap<T>::_unit_column_()
 {
-    return _unit.x();
+    return _unit.column;
 }
 
 /**
@@ -357,7 +369,7 @@ template< typename T >
 inline
 uint32_t basic_gridmap<T>::_plane_row_()
 {
-    return _plane.y();
+    return _plane.row;
 }
 
 /**
@@ -367,7 +379,7 @@ template< typename T >
 inline
 uint32_t basic_gridmap<T>::_plane_column_()
 {
-    return _plane.x();
+    return _plane.column;
 }
 
 /**
@@ -473,7 +485,7 @@ int basic_gridmap<T>::fwrite(const QString fname)
     out.writeRawData(&__GridMapFileTag__[0],__GridMapTagSize__);
     // file header
     out.setByteOrder(QDataStream::LittleEndian); //bmp data format:littleEndian
-    out << _unit.y() << _unit.x() << _plane.y() << _plane.x();
+    out << _unit.row << _unit.column << _plane.row << _plane.column;
 
     uint64_t i, j;
     for(i = 0; i < _map_data.size(); i++)
@@ -493,7 +505,7 @@ template< typename T >
 inline
 int basic_gridmap<T>::_fwrite(QDataStream& out, const lssmap_pixel_t &pixel)
 {
-    out << pixel.mean.y() << pixel.mean.x()
+    out << pixel.mean.x() << pixel.mean.y()
         << pixel.inv_cov(0,0) << pixel.inv_cov(0,1) << pixel.inv_cov(1,0) << pixel.inv_cov(1,1)
         << pixel.k;
     return 0;
@@ -528,7 +540,7 @@ template< typename T >
 inline
 int basic_gridmap<T>::_fwrite(QDataStream& out, const cmap_pixel_t &pixel)
 {
-    out << pixel.pos_sum.y() << pixel.pos_sum.x()
+    out << pixel.pos_sum.x() << pixel.pos_sum.y()
         << pixel.cov_sum(0,0) << pixel.cov_sum(0,1) << pixel.cov_sum(1,0) << pixel.cov_sum(1,1)
         << pixel.cnt ;
 
@@ -565,10 +577,10 @@ int basic_gridmap<T>::fread(const QString fname)
 
     //Read map size
     in.setByteOrder(QDataStream::LittleEndian); //bmp data format: littleEndian
-    in >> _unit.ry() >> _unit.rx() >> _plane.ry() >> _plane.rx();
+    in >> _unit.row >> _unit.column >> _plane.row >> _plane.column;
 
     //Create data buffer
-    if(allocate(_plane.y()*_unit.y(), _plane.x()*_unit.x()) < 0)
+    if(allocate(_plane.row*_unit.column, _plane.column*_unit.column) < 0)
     {
         qDebug() << "Allocate memory failer!";
         return -1;
@@ -576,9 +588,9 @@ int basic_gridmap<T>::fread(const QString fname)
 
     T pixel;
 
-    for(uint64_t i = 0; i < _plane.y()*_unit.y();i++)
+    for(uint64_t i = 0; i < _plane.row*_unit.row;i++)
     {
-        for(uint64_t j = 0; j < _plane.x()*_unit.x();j++)
+        for(uint64_t j = 0; j < _plane.column*_unit.column;j++)
         {
           //read pixel data from file
           if(_fread(in,&pixel) < 0)
@@ -601,9 +613,9 @@ template< typename T >
 inline
 int basic_gridmap<T>::_fread(QDataStream& in, lssmap_pixel_t *pixel)
 {
-    if(!in.atEnd()) in >> pixel->mean.ry();
-    else return -1;
     if(!in.atEnd()) in >> pixel->mean.rx();
+    else return -1;
+    if(!in.atEnd()) in >> pixel->mean.ry();
     else return -1;
     if(!in.atEnd()) in >> pixel->inv_cov(0,0);
     else return -1;
@@ -653,10 +665,10 @@ template< typename T >
 inline
 int basic_gridmap<T>::_fread(QDataStream& in, cmap_pixel_t *pixel)
 {
-    if(!in.atEnd()) in >> pixel->pos_sum.ry();
+    if(!in.atEnd()) in >> pixel->pos_sum.rx();
     else return -1;
 
-    if(!in.atEnd()) in >> pixel->pos_sum.rx();
+    if(!in.atEnd()) in >> pixel->pos_sum.ry();
     else return -1;
 
     if(!in.atEnd()) in >> pixel->cov_sum(0,0);

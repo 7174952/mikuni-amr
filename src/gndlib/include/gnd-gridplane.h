@@ -65,7 +65,7 @@ public:
     // ---> setter, getter
 public:
     // get pixel index
-    int pindex(const double x, const double y, qint64 *c, qint64 *r);
+    int pindex(const double x, const double y, qint64 *r, qint64 *c);
     // get pixel pointer
     T* ppointer(const double x, const double y);
     // get pixel value
@@ -96,11 +96,11 @@ public:
     double height();
 
     // get a pixel lower boundary position
-    int pget_pos_lower(const quint64 c, const quint64 r, double *x, double *y);
+    int pget_pos_lower(const quint64 r, const quint64 c, double *x, double *y);
     // get a pixel upper boundary position
-    int pget_pos_upper(const quint64 c, const quint64 r, double *x, double *y);
+    int pget_pos_upper(const quint64 r, const quint64 c, double *x, double *y);
     // get a pixel core position
-    int pget_pos_core(const quint64 c, const quint64 r, double *x, double *y);
+    int pget_pos_core(const quint64 r, const quint64 c, double *x, double *y);
     // <--- setter, getter
 
 public:
@@ -199,7 +199,7 @@ int gridplane<T>::reallocate(const double xs, const double ys)
     int tmp;
 
     // compute access index of row and column
-    if( (tmp = pindex(xs, ys, &c, &r)) == 0 )	return 0;
+    if( (tmp = pindex(xs, ys, &r, &c)) == 0 )	return 0;
 
     // reallocate
      if( (ret = basic_gridmap<T>::reallocate(r,c)) < 0 ) return ret;
@@ -228,7 +228,7 @@ int gridplane<T>::reallocate(const double xs, const double ys)
  */
 template< typename T >
 inline
-int gridplane<T>::pindex(const double x, const double y, qint64 *c, qint64 *r)
+int gridplane<T>::pindex(const double x, const double y, qint64 *r, qint64 *c)
 {
     if( !basic_gridmap<T>::is_allocate() ) return -1;
 
@@ -236,8 +236,6 @@ int gridplane<T>::pindex(const double x, const double y, qint64 *c, qint64 *r)
     double yy = y - _orgn.y();
     *r = qFloor( yy / _rsl.y() );
     *c = qFloor( xx / _rsl.x() );
-//    *r = qCeil( yy / _rsl.y() );
-//    *c = qCeil( xx / _rsl.x() );
 
     return ((*r >= 0) && (*r < (signed)basic_gridmap<T>::row()) &&
             (*c >= 0) && (*c < (signed)basic_gridmap<T>::column()) ) ? 0 : -1;
@@ -300,7 +298,7 @@ T* gridplane<T>::ppointer(const double x, const double y)
 {
     qint64 r, c;
 
-    if( pindex(x, y, &c, &r) < 0 ) return 0;
+    if( pindex(x, y, &r, &c) < 0 ) return 0;
 
     return basic_gridmap<T>::pointer(r, c);
 }
@@ -371,7 +369,7 @@ int gridplane<T>::pget(const double x, const double y, T* v)
     qint64 r, c;
 
     if(!v)	return -1;
-    if( pindex(x, y, &c, &r) < 0 ) return -1;
+    if( pindex(x, y, &r, &c) < 0 ) return -1;
     *v = *basic_gridmap<T>::pointer(r, c);
     return 0;
 }
@@ -388,7 +386,7 @@ int gridplane<T>::pset(const double x, const double y, const T &v)
 {
     long r = 0, c = 0;
     if(!v)	return -1;
-    for( int ret = pindex(x, y, &c, &r); ret < 0; ret = pindex(x, y, &c, &r))
+    for( int ret = pindex(x, y, &r, &c); ret < 0; ret = pindex(x, y, &r, &c))
     {
         int ret_realloc;
         if( (ret_realloc = reallocate(x,y)) < 0) return -1;
@@ -480,7 +478,7 @@ int gridplane<T>::pset_rsl(double x, double y)
  */
 template< typename T >
 inline
-int gridplane<T>::pget_pos_lower(const quint64 c, const quint64 r, double *x, double *y)
+int gridplane<T>::pget_pos_lower(const quint64 r, const quint64 c, double *x, double *y)
 {
     *x = _orgn.x() + c * _rsl.x();
     *y = _orgn.y() + r * _rsl.y();
@@ -493,9 +491,9 @@ int gridplane<T>::pget_pos_lower(const quint64 c, const quint64 r, double *x, do
  */
 template< typename T >
 inline
-int gridplane<T>::pget_pos_upper(const quint64 c, const quint64 r, double *x, double *y)
+int gridplane<T>::pget_pos_upper(const quint64 r, const quint64 c, double *x, double *y)
 {
-    pget_pos_lower(c, r, x, y);
+    pget_pos_lower(r, c, x, y);
     *x += _rsl.x();
     *y += _rsl.y();
     return 0;
@@ -507,9 +505,9 @@ int gridplane<T>::pget_pos_upper(const quint64 c, const quint64 r, double *x, do
  */
 template< typename T >
 inline
-int gridplane<T>::pget_pos_core(const quint64 c, const quint64 r, double *x, double *y)
+int gridplane<T>::pget_pos_core(const quint64 r, const quint64 c, double *x, double *y)
 {
-    pget_pos_lower(c, r, x, y);
+    pget_pos_lower(r, c, x, y);
     *x += _rsl.x() / 2.0;
     *y += _rsl.y() / 2.0;
     return 0;
@@ -542,7 +540,7 @@ int gridplane<T>::fwrite(const QString fname)
     // file header
 
     out.setByteOrder(QDataStream::LittleEndian); //bmp data format: littleEndian
-    out << basic_gridmap<T>::_unit.y() << basic_gridmap<T>::_unit.x() << basic_gridmap<T>::_plane.y() << basic_gridmap<T>::_plane.x();
+    out << basic_gridmap<T>::_unit.row << basic_gridmap<T>::_unit.column << basic_gridmap<T>::_plane.row << basic_gridmap<T>::_plane.column;
     out << _orgn.x() << _orgn.y() << _rsl.x() << _rsl.y();
 
     uint64_t r, c;
@@ -590,11 +588,11 @@ int gridplane<T>::fread(const QString fname)
 
     //Read map size
     in.setByteOrder(QDataStream::LittleEndian); //bmp data format: LittleEndian
-    in >> basic_gridmap<T>::_unit.ry() >> basic_gridmap<T>::_unit.rx() >> basic_gridmap<T>::_plane.ry() >> basic_gridmap<T>::_plane.rx();
+    in >> basic_gridmap<T>::_unit.row >> basic_gridmap<T>::_unit.column >> basic_gridmap<T>::_plane.row >> basic_gridmap<T>::_plane.column;
     in >> _orgn.rx() >> _orgn.ry() >> _rsl.rx() >> _rsl.ry();
 
     //Create data buffer
-    if(basic_gridmap<T>::allocate(basic_gridmap<T>::_plane.y()*basic_gridmap<T>::_unit.y(), basic_gridmap<T>::_plane.x()*basic_gridmap<T>::_unit.x()) < 0)
+    if(basic_gridmap<T>::allocate(basic_gridmap<T>::_plane.row*basic_gridmap<T>::_unit.column, basic_gridmap<T>::_plane.row*basic_gridmap<T>::_unit.column) < 0)
     {
         qDebug() << "Allocate memory failer!";
         file.close();
@@ -603,9 +601,9 @@ int gridplane<T>::fread(const QString fname)
 
     T pixel;
 
-    for(uint64_t r = 0; r < basic_gridmap<T>::_plane.y()*basic_gridmap<T>::_unit.y();r++)
+    for(uint64_t r = 0; r < basic_gridmap<T>::_plane.row*basic_gridmap<T>::_unit.row;r++)
     {
-        for(uint64_t c = 0; c < basic_gridmap<T>::_plane.x()*basic_gridmap<T>::_unit.x();c++)
+        for(uint64_t c = 0; c < basic_gridmap<T>::_plane.column*basic_gridmap<T>::_unit.column;c++)
         {
           //read pixel data from file
           if(basic_gridmap<T>::_fread(in,&pixel) < 0)

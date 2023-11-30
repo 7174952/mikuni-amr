@@ -251,9 +251,9 @@ int counting_map(cmap_t *m, double x, double y)
         }
 
         // get row and column number of reflection point pixel
-        m->plane[i].pindex(x, y, &c, &r);
+        m->plane[i].pindex(x, y, &r, &c);
         // get core position of reflection point pixel
-        m->plane[i].pget_pos_core(c, r, &core.rx(), &core.ry());
+        m->plane[i].pget_pos_core(r, c, &core.rx(), &core.ry());
 
         // compute reflection point on pixel
         pos = xx - core;
@@ -264,7 +264,7 @@ int counting_map(cmap_t *m, double x, double y)
         cov(1,0) = pos.y()*pos.x();
         cov(1,1) = pos.y()*pos.y();
 
-        // add date
+        // add data
         pp->pos_sum += pos;
         pp->cov_sum += cov;
         pp->cnt++;
@@ -338,7 +338,7 @@ int build_map(lssmap_t *map, cmap_t *cnt, double sr, uint32_t alpha, double blur
 
                 // get ndt data
                 cnt->plane[i].get(r, c, &cp);
-                cnt->plane[i].pget_pos_core(c, r, &x, &y);
+                cnt->plane[i].pget_pos_core(r, c, &x, &y);
                 for( pp = map->plane[i].ppointer( x, y );
                      pp == 0;
                      pp = map->plane[i].ppointer( x, y ) )
@@ -602,7 +602,7 @@ int likelihood(lssmap_t *map, double x, double y, double *l)
         qint64 pr, pc;
 
         // get index of pixel
-        ret = map->plane[i].pindex( pos(0,0), pos(1,0), &pc, &pr );
+        ret = map->plane[i].pindex( pos(0,0), pos(1,0), &pr, &pc );
         // no data
         if( ret < 0 )			continue;
 
@@ -612,7 +612,7 @@ int likelihood(lssmap_t *map, double x, double y, double *l)
         if( pp->k <= 0.0 )	continue;
 
         // get pixel core pos on ndt data pixel
-        map->plane[i].pget_pos_core(pc, pr, &q(0,0), &q(1,0));
+        map->plane[i].pget_pos_core(pr, pc, &q(0,0), &q(1,0));
         q = pos - q;
 
         // difference from mean
@@ -842,7 +842,7 @@ int build_bmp(bmp8_t *bmp, lssmap_t *map, double ps, double sr, double cp)
             for( quint64 c = 0; c < ws.column(); c++)
             {
                 // get pixel core position
-                ws.pget_pos_core(c, r, &x, &y);
+                ws.pget_pos_core(r, c, &x, &y);
 
                 // compute likelihood
                 likelihood(map, x, y, &lkh);
@@ -958,7 +958,7 @@ int build_bmp(bmp32_t *bmp, lssmap_t *map, double ps, double sr, double cp)
             for( quint64 c = 0; c < ws.column(); c++)
             {
                 // get pixel core position
-                ws.pget_pos_core(c, r, &x, &y);
+                ws.pget_pos_core(r, c, &x, &y);
 
                 // compute likelihood
                 likelihood(map, x, y, &lkh);
