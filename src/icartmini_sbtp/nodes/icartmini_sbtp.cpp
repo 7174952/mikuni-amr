@@ -257,7 +257,7 @@ int main(int argc, char **argv)
         else {
           ROS_INFO("    ... ok");
         }
-		} // <--- load route data file
+    } // <--- load route data file
 
 		// ---> search path
     if( ros::ok() && path_net.n_waypoints() > 0 && node_config.start_node.value.at(0).size() > 0 && node_config.dest_node.value.at(0).size() > 0 )
