@@ -749,12 +749,12 @@ namespace gnd
         if( (i_dest = index_waypoint(dest)) < 0 )	return -1;
 
         { // ---> initialize cost
-            for( i = 0; i < (signed)costs.size(); i++ )
+            for( i = 0; i < n_waypoints(); i++ )
             {
                 ws.cost = DBL_MAX;
                 ws.done = false;
                 ws.path.clear();
-                costs.append(ws);
+                costs.push_back(ws);
             }
             // at start, cost is 0
             costs[i_start].cost = 0;
