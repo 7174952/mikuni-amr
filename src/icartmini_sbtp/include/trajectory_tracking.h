@@ -1,3 +1,11 @@
+/*
+ * trajectory_tracking.h
+ *
+ *  Created on: 2023/12/01
+ *      Author: ryu
+ *       Brief: change trajectory to velocity and sent to amr
+ */
+
 #ifndef __TRAJECTORY_TRACKING_H__
 #define __TRAJECTORY_TRACKING_H__
 
