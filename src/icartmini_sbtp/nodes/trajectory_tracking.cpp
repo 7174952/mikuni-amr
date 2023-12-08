@@ -1,3 +1,10 @@
+/*
+ * trajectory_tracking.h
+ *
+ *  Created on: 2023/12/01
+ *      Author: ryu
+ *       Brief: change trajectory to velocity and sent to amr
+ */
 #include <cstdio>
 #include <cmath>
 #include <vector>
@@ -10,6 +17,7 @@
 
 #include "trajectory_tracking.h"
 #include "om_cart/om_cart_state.h"
+#include "icartmini_sbtp/target_move_angle.h"
 
 
 Trajectory_tracking::Trajectory_tracking()
@@ -38,7 +46,7 @@ Trajectory_tracking::Trajectory_tracking()
     amr_info.actual_pose.theta = 0;
     amr_info.actual_pose.time = 0;
 
-    //ryu debug, accel default
+    //accel default
     amr_info.dv = 1.5;
     amr_info.dw = 0.5;
     amr_info.vref_smooth = 0;
@@ -61,8 +69,6 @@ Trajectory_tracking::Trajectory_tracking()
     cir_end_1_theta = 0;
     cir_end_2_theta = 0;
 
-    is_ready_start = false;
-
     sub_max_vel = nh.subscribe<std_msgs::Float64MultiArray>("amr_set_vel",100,&Trajectory_tracking::maxVelCallback,this);
     sub_trajectory_pose = nh.subscribe<geometry_msgs::Pose2D>("amr_trajectory_pose",100,&Trajectory_tracking::trajectoryPoseCallback,this);
     sub_odom_pose = nh.subscribe<gnd_msgs::msg_pose2d_stamped>("pose_particle_localizer",100,&Trajectory_tracking::odomPoseCallback, this);
@@ -78,9 +84,7 @@ Trajectory_tracking::Trajectory_tracking()
 
     pub_vehicle_status = nh.advertise<gnd_msgs::msg_vehicle_status>("vehicle_status",100);
     pub_cmd_vel = nh.advertise<geometry_msgs::Twist>("cmd_vel", 100);
-//    srv_moveAngle = nh.advertiseService("trajectory_tracking/set_move_angle", &Trajectory_tracking::setMoveAngle, this);
-//    client_setTarget = nh.serviceClient<nkm_destination_queue::AddDestination>("nkm_destination_queue/add_destination");
-    is_waypoint_ready = false;
+    srv_moveAngle = nh.advertiseService("trajectory_tracking/set_move_angle", &Trajectory_tracking::setMoveAngle, this);
 }
 
 void Trajectory_tracking::cartStatusCallback(const om_cart::om_cart_state::ConstPtr& status)
@@ -92,23 +96,15 @@ void Trajectory_tracking::cartStatusCallback(const om_cart::om_cart_state::Const
 
 }
 
-#if 0
-bool Trajectory_tracking::setMoveAngle(nkm_destination_queue::AddDestination::Request &req, nkm_destination_queue::AddDestination::Response &res)
+bool Trajectory_tracking::setMoveAngle(icartmini_sbtp::target_move_angle::Request &req, icartmini_sbtp::target_move_angle::Response &res)
 {
-    amr_info.targetName = req.destination;
     amr_info.stopAngle = req.moveTheta;
 
-    srv_dest.request.destination = req.destination;
-    srv_dest.request.indexInQueue = req.indexInQueue;
-    srv_dest.request.moveTheta = req.moveTheta;
-    is_waypoint_ready = true;
-
-    res.orderID = true;
+    res.result = true;
 
     return true;
 
 }
-#endif
 
 void Trajectory_tracking::maxVelCallback(const std_msgs::Float64MultiArray::ConstPtr& max_vel)
 {
@@ -172,22 +168,6 @@ void Trajectory_tracking::plannedPathCallback(const gnd_msgs::msg_path_area_and_
     planned_path.start = path->start;
     planned_path.path.resize(path->path.size());
     planned_path.path = path->path;
-
-    is_ready_start = true;
-}
-
-bool Trajectory_tracking::get_waypoint_status()
-{
-    return is_waypoint_ready;
-}
-
-void Trajectory_tracking::set_target_point()
-{
-#if 0
-    client_setTarget.call(srv_dest);
-#endif
-
-    is_waypoint_ready = false;
 }
 
 void Trajectory_tracking::run()
@@ -303,12 +283,6 @@ int main(int argc, char** argv)
 
     while(ros::ok())
     {
-        //update waypoint to target
-        if(trajectory_tracking.get_waypoint_status())
-        {
-            trajectory_tracking.set_target_point();
-        }
-
         trajectory_tracking.run();
 
         ros::spinOnce();
