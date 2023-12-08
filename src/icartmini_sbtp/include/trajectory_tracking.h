@@ -9,12 +9,13 @@
 #include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Bool.h"
 #include "sensor_msgs/Joy.h"
-//#include "nkm_destination_queue/AddDestination.h"
 
+#include "icartmini_sbtp/target_move_angle.h"
 #include "gnd_msgs/msg_pose2d_stamped.h"
 #include "gnd_msgs/msg_vehicle_status.h"
 #include "gnd_msgs/msg_velocity2d_with_covariance_stamped.h"
 #include "gnd_msgs/msg_path_area_and_speed_limited.h"
+
 
 #include "om_cart/om_cart_state.h"
 #include "om_cart.h"
@@ -128,16 +129,12 @@ private:
     double cir_end_1_theta;
     double cir_end_2_theta;
 
-    bool is_ready_start;
-
-
     ros::Subscriber	subsc_controller;
     ros::Subscriber subsc_vehicle_status;
     ros::Publisher  pub_vehicle_status;
     ros::ServiceServer srv_moveAngle;
     ros::ServiceClient client_setTarget;
-//    nkm_destination_queue::AddDestination srv_dest;
-    bool is_waypoint_ready;
+    icartmini_sbtp::target_move_angle srv_dest;
 
 
     ros::Subscriber subsc_odom_vel;
@@ -151,7 +148,7 @@ private:
     void trajectoryPoseCallback(const geometry_msgs::Pose2D::ConstPtr& trajectory_pose);
     void odomPoseCallback(const gnd_msgs::msg_pose2d_stamped::ConstPtr& odom);
     void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
-//    bool setMoveAngle(nkm_destination_queue::AddDestination::Request &req, nkm_destination_queue::AddDestination::Response &res);
+    bool setMoveAngle(icartmini_sbtp::target_move_angle::Request &req, icartmini_sbtp::target_move_angle::Response &res);
 
     void vehicleStatusCallback(const gnd_msgs::msg_vehicle_status::ConstPtr& vehicle_status);
     void odomVelCallback(const gnd_msgs::msg_velocity2d_with_covariance_stamped::ConstPtr& vel);
