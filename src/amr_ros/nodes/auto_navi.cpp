@@ -8,9 +8,10 @@
 
 #include <ros/ros.h>
 #include "sensor_msgs/Joy.h"
-#include "nkm_destination_queue/srv_add_destination.h"
 #include "gnd_msgs/msg_vehicle_status.h"
 #include "std_msgs/Bool.h"
+#include "auto_navi.h"
+#include "gnd_rosutil.h"
 
 typedef struct
 {
@@ -24,13 +25,14 @@ typedef struct
 #define DEMO_SET_TARGET_POINT  0
 #define DEMO_WAIT_VEHICLE_RUN  1
 #define DEMO_WAIT_VEHICLE_IDLE 2
-#define DEMO_WAIT_JOY_CMD_RUN  3
+#define DEMO_WAIT_MANUAL_RUN  3
 
 std::vector<Target_info> target_list;
 ros::ServiceClient client_setTarget;
 int16_t target_pos = 0;
-bool run_by_joy = true;
+bool run_by_manual = true;
 ros::Publisher  pub_voice;   
+nkm::AutoSetDest destinationSetter;
 
 
 uint8_t vehi_status = gnd_msgs::msg_vehicle_status::VEHICLE_STATE_IDLE;
@@ -60,26 +62,24 @@ std::vector<std::string> split(const std::string& str, const std::string& delim)
 
 int8_t setTargetPoint()
 {
-    nkm_destination_queue::srv_add_destination srv_dest;
+    // nkm_destination_queue::srv_add_destination srv_dest;
     std_msgs::Bool is_arrived;
     is_arrived.data = false;
-    int8_t way_point_status = -1; //-1 - stop and wait joy cmd to run, 0 - not stop , >0 - stop to wait n minutes and auto to run to next waypoint
+    int8_t wait_time = -1; //-1 - stop and wait maunal cmd to run, 0 - not stop , >0 - stop to wait n minutes and auto to run to next waypoint
 
-    way_point_status = target_list[target_pos].waitTime;
-    //send stopping angle
+    wait_time = target_list[target_pos].waitTime;
     //send target and start to run
-    srv_dest.request.destination = target_list[target_pos].targetName;
-    srv_dest.request.indexInQueue = 1;
-    srv_dest.request.moveTheta = (int32_t)((target_list[target_pos].stop2TurnAngle / 180) * M_PI);
-    if(client_setTarget.call(srv_dest))
+    ROS_INFO("setTargetPoint waypoint: %s", target_list[target_pos].targetName.c_str());
+
+    if(destinationSetter.SetDestination(target_list[target_pos].targetName.c_str(), target_list[target_pos].stop2TurnAngle) < 0)
     {
-        ROS_INFO("Set Dest:%s OK", srv_dest.request.destination.c_str());
+        ROS_ERROR("Error:Set Target:%s Failed!", target_list[target_pos].targetName.c_str());
     }
     else
     {
-        ROS_ERROR("Set Dest:%s Failed!", srv_dest.request.destination.c_str());
-        return -1;
-    }  
+        ROS_INFO("Set Target:%s Successful!", target_list[target_pos].targetName.c_str());
+    }
+
     target_pos += 1;
  
     if(target_pos >= target_list.size())
@@ -87,14 +87,14 @@ int8_t setTargetPoint()
         target_pos -= target_list.size();
     }
 
-    return way_point_status;
+    return wait_time;
 }
 
 void footSwitchCallback(const std_msgs::Bool::ConstPtr& msg)
 {
     if(msg->data == true)
     {
-        run_by_joy = true;
+        run_by_manual = true;
     }
 }
 
@@ -127,6 +127,7 @@ void read_target_list_from_file(std::ifstream *file)
 
         ss_num = std::istringstream(res[2]);
         ss_num >> item_tmp.stop2TurnAngle;
+        item_tmp.stop2TurnAngle = gnd_deg2ang(item_tmp.stop2TurnAngle);
 
         ss_num = std::istringstream(res[3]);
         ss_num >> item_tmp.waitTime;
@@ -139,7 +140,29 @@ void read_target_list_from_file(std::ifstream *file)
 
 int main(int argc, char** argv)
 {
-    ros::init(argc,argv,"auto_navi");
+    nkm::node_config			node_config;
+    // read configuration
+    if( argc > 1 )
+    {
+        ROS_INFO("=> read configuration file");
+        if( nkm::fread_node_config( QString(argv[1]), &node_config ) < 0 )
+        {
+            ROS_ERROR("... Error: fail to read configuration file %s", argv[1]);
+            QString fname = QString(argv[1]) + ".tmp";
+            // file out configuration file
+            if( nkm::fwrite_node_config( fname, &node_config ) >= 0 )
+            {
+                ROS_INFO("     : output sample configuration file %s", fname.toStdString().c_str());
+            }
+            return -1;
+        }
+        else
+        {
+            ROS_INFO("   ... ok, read config file %s", argv[1]);
+        }
+    }
+
+    ros::init(argc,argv,node_config.node_name.value.at(0).toStdString());
     ros::NodeHandle nh;
     ros::Subscriber sub_foot_switch;
     ros::Subscriber sub_vehicle_status;
@@ -149,16 +172,12 @@ int main(int argc, char** argv)
     std_msgs::Bool is_arrived;
     is_arrived.data = false;
 
+    destinationSetter.Initialize(&node_config);
 
     ROS_INFO("Auto Navi node started!");
 
-    std::string file_name = "target_list.txt";
     //Read target list file
-    if(argc > 1)
-    {
-        file_name = argv[1];
-    }
-    std::ifstream target_file(file_name,std::ios::in);
+    std::ifstream target_file(node_config.target_list_file.value.at(0).toStdString(),std::ios::in);
     if(!target_file)
     {
         std::cout << "Open target file error!" << std::endl;
@@ -169,16 +188,16 @@ int main(int argc, char** argv)
 
     //init topic
     sub_foot_switch = nh.subscribe<std_msgs::Bool>("amr_start",10,&footSwitchCallback);
-    sub_vehicle_status = nh.subscribe<gnd_msgs::msg_vehicle_status>("vehicle_status",10,&vehicleStatusCallback);
+    sub_vehicle_status = nh.subscribe<gnd_msgs::msg_vehicle_status>(node_config.topic_name_status.value.at(0).toStdString(),10,&vehicleStatusCallback);
     pub_voice = nh.advertise<std_msgs::Bool>("voice_arrived",100);
     //init service
-    client_setTarget = nh.serviceClient<nkm_destination_queue::srv_add_destination>("trajectory_tracking/set_move_angle");
+    // client_setTarget = nh.serviceClient<nkm_destination_queue::srv_add_destination>("trajectory_tracking/set_move_angle");
 
     ros::Rate loop_rate(100);
 
     if(vehi_status == gnd_msgs::msg_vehicle_status::VEHICLE_STATE_IDLE)
     {
-        state = DEMO_WAIT_JOY_CMD_RUN;
+        state = DEMO_WAIT_MANUAL_RUN;
     }
     else
     {
@@ -202,18 +221,18 @@ int main(int argc, char** argv)
         case DEMO_WAIT_VEHICLE_IDLE:
             if(vehi_status == gnd_msgs::msg_vehicle_status::VEHICLE_STATE_IDLE)
             {
-                state = (waypoint_status >= 0) ?  DEMO_SET_TARGET_POINT : DEMO_WAIT_JOY_CMD_RUN;
-                if(state == DEMO_WAIT_JOY_CMD_RUN)
+                state = (waypoint_status >= 0) ?  DEMO_SET_TARGET_POINT : DEMO_WAIT_MANUAL_RUN;
+                if(state == DEMO_WAIT_MANUAL_RUN)
                 {
                     is_arrived.data = true;
                     pub_voice.publish(is_arrived);
                 }
             }
             break;
-        case DEMO_WAIT_JOY_CMD_RUN:
-            if(run_by_joy)
+        case DEMO_WAIT_MANUAL_RUN:
+            if(run_by_manual)
             {
-                run_by_joy = false;
+                run_by_manual = false;
                 state = DEMO_SET_TARGET_POINT;
             }
             break;
