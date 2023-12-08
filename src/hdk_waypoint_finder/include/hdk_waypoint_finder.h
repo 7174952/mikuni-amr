@@ -36,81 +36,81 @@ namespace hdk {
     {
         double x;
         double y;
-		} point2d_t;
+    } point2d_t;
 
     typedef struct
     {
         double x;
         double y;
         double theta;
-		} pose2d_t;
+    } pose2d_t;
 
 
-		/**
-		 * @brief 地図座標系の点を指定した経路座標系に変換する関数．
-		 *        始点と終点で経路を指定するが，存在しないときは失敗し，dstは不定．
-		 * @param[in] path_net パスネット
-		 * @param[in] waypoint_name_start 経路の始点
-		 * @param[in] waypoint_name_end 経路の終点
-		 * @param[in] src 点（地図座標系）
-		 * @param[out] dst 点（経路座標系）
-		 * @return true 成功, false 失敗
-		 */
-		bool coordtf_map_to_path( gnd::path::path_net_area_and_speed_limited &path_net,
-				const char *waypoint_name_start, const char *waypoint_name_end,
-        const point2d_t &src, point2d_t &dst);
+    /**
+     * @brief 地図座標系の点を指定した経路座標系に変換する関数．
+     *        始点と終点で経路を指定するが，存在しないときは失敗し，dstは不定．
+     * @param[in] path_net パスネット
+     * @param[in] waypoint_name_start 経路の始点
+     * @param[in] waypoint_name_end 経路の終点
+     * @param[in] src 点（地図座標系）
+     * @param[out] dst 点（経路座標系）
+     * @return true 成功, false 失敗
+     */
+    bool coordtf_map_to_path( gnd::path::path_net_area_and_speed_limited &path_net,
+            const char *waypoint_name_start, const char *waypoint_name_end,
+    const point2d_t &src, point2d_t &dst);
 
-		/**
-		 * @brief 指定した点が経路の中にあるか判定する関数．
-		 * @param[in] path_net パスネット
-		 * @param[in] waypoint_name_start 経路の始点
-		 * @param[in] waypoint_name_end 経路の終点
-		 * @param[in] x 位置（地図座標系）
-		 * @param[in] y 位置（地図座標系）
-		 * @param[in] expansion Configuration-spaceで膨張させる量
-		 *                      ロボットの大きさ（ロボット座標系中心から最も離れている部分までの長さ）を設定するとよい
-		 * @return true 存在する, flase それ以外
-		 * @note パス自体が存在しない場合はfalseを返す．
-		 */
-		bool is_in_path( gnd::path::path_net_area_and_speed_limited &path_net,
-				const char *waypoint_name_start, const char *waypoint_name_end,
-				double x, double y, double expansion );
-
-
-		/**
-		 * @brief 指定した点が経路の中にあるか判定する関数．
-		 * @param[in] path_net パスネット
-		 * @param[in] x 位置（地図座標系）
-		 * @param[in] y 位置（地図座標系）
-		 * @param[in] expansion Configuration-spaceで膨張させる量
-		 *                      ロボットの大きさ（ロボット座標系中心から最も離れている部分までの長さ）を設定するとよい
-		 * @return true 存在する, flase それ以外
-		 */
-		bool is_in_path_net( gnd::path::path_net_area_and_speed_limited &path_net, double x, double y, double expansion );
+    /**
+     * @brief 指定した点が経路の中にあるか判定する関数．
+     * @param[in] path_net パスネット
+     * @param[in] waypoint_name_start 経路の始点
+     * @param[in] waypoint_name_end 経路の終点
+     * @param[in] x 位置（地図座標系）
+     * @param[in] y 位置（地図座標系）
+     * @param[in] expansion Configuration-spaceで膨張させる量
+     *                      ロボットの大きさ（ロボット座標系中心から最も離れている部分までの長さ）を設定するとよい
+     * @return true 存在する, flase それ以外
+     * @note パス自体が存在しない場合はfalseを返す．
+     */
+    bool is_in_path( gnd::path::path_net_area_and_speed_limited &path_net,
+            const char *waypoint_name_start, const char *waypoint_name_end,
+            double x, double y, double expansion );
 
 
-		/**
-		 * @brief 指定した位置に最も近い経路点(waypoint)を返す関数．
-		 *        指定した位置が走行可能領域でないときは，失敗し，waypoint_nameは不定．
-		 * @param[in] path_net パスネット
-		 * @param[in] x 位置（地図座標系）
-		 * @param[in] y 位置（地図座標系）
-		 * @param[in] expansion Configuration-spaceで膨張させる量
-		 *                      ロボットの大きさ（ロボット座標系中心から最も離れている部分までの長さ）を設定するとよい
-		 * @param[in] waypoint_name_destination 目的地の名前
-		 * @param[out] waypoint_name 最も近い経路点の名前
-		 * @return true 成功, false 失敗
-		 */
-		bool find_waypoint( gnd::path::path_net_area_and_speed_limited &path_net,
-				double x, double y, double expansion,
-				const char *waypoint_name_destination, char *waypoint_name );
+    /**
+     * @brief 指定した点が経路の中にあるか判定する関数．
+     * @param[in] path_net パスネット
+     * @param[in] x 位置（地図座標系）
+     * @param[in] y 位置（地図座標系）
+     * @param[in] expansion Configuration-spaceで膨張させる量
+     *                      ロボットの大きさ（ロボット座標系中心から最も離れている部分までの長さ）を設定するとよい
+     * @return true 存在する, flase それ以外
+     */
+    bool is_in_path_net( gnd::path::path_net_area_and_speed_limited &path_net, double x, double y, double expansion );
 
-		/**
-		 * @brief パスの長さ（道のり）を返す関数．
-		 * @param[in] path
-		 * @return パスの長さ
-		 */
-		double get_path_length(gnd::path::path_net_area_and_speed_limited::path_t &path);
+
+    /**
+     * @brief 指定した位置に最も近い経路点(waypoint)を返す関数．
+     *        指定した位置が走行可能領域でないときは，失敗し，waypoint_nameは不定．
+     * @param[in] path_net パスネット
+     * @param[in] x 位置（地図座標系）
+     * @param[in] y 位置（地図座標系）
+     * @param[in] expansion Configuration-spaceで膨張させる量
+     *                      ロボットの大きさ（ロボット座標系中心から最も離れている部分までの長さ）を設定するとよい
+     * @param[in] waypoint_name_destination 目的地の名前
+     * @param[out] waypoint_name 最も近い経路点の名前
+     * @return true 成功, false 失敗
+     */
+    bool find_waypoint( gnd::path::path_net_area_and_speed_limited &path_net,
+            double x, double y, double expansion,
+            const char *waypoint_name_destination, char *waypoint_name );
+
+    /**
+     * @brief パスの長さ（道のり）を返す関数．
+     * @param[in] path
+     * @return パスの長さ
+     */
+    double get_path_length(gnd::path::path_net_area_and_speed_limited::path_t &path);
 
 	}
 }
@@ -118,8 +118,8 @@ namespace hdk {
 namespace hdk {
 	namespace waypoint_finder {
 
-		bool coordtf_map_to_path( gnd::path::path_net_area_and_speed_limited &path_net,
-				const char *waypoint_name_start, const char *waypoint_name_end,
+    bool coordtf_map_to_path( gnd::path::path_net_area_and_speed_limited &path_net,
+        const char *waypoint_name_start, const char *waypoint_name_end,
         const point2d_t &src, point2d_t &dst)
     {
         gnd::path::path_net_area_and_speed_limited::property_t prop;
@@ -150,9 +150,9 @@ namespace hdk {
             } // <--- find offset
 
             gnd::matrix::coordinate_converter( &mat_coordtf_map_to_path,
-                offset.x, offset.y, 0.0,
-                std::cos(-theta), std::sin(-theta), 0.0,
-                0.0, 0.0, 1.0);
+                                                offset.x,         offset.y,         0.0,
+                                                std::cos(-theta), std::sin(-theta), 0.0,
+                                                0.0,              0.0,              1.0);
 
             { // ---> transform
                 /* set source */
@@ -161,17 +161,17 @@ namespace hdk {
                 point_on_map(0,2) = 0.0;
                 point_on_map(0,3) = 1.0;
                 /* transform  */
-                point_on_path = point_on_map * mat_coordtf_map_to_path;
+                point_on_path = point_on_map * mat_coordtf_map_to_path.transposed();
                 /* set return value */
                 dst.x = point_on_path(0,0);
                 dst.y = point_on_path(0,1);
             } // <--- transform
         }
         return true;
-		}
+    }
 
-		bool is_in_path( gnd::path::path_net_area_and_speed_limited &path_net,
-				const char *waypoint_name_start, const char *waypoint_name_end,
+    bool is_in_path( gnd::path::path_net_area_and_speed_limited &path_net,
+        const char *waypoint_name_start, const char *waypoint_name_end,
         double x, double y, double expansion )
     {
         gnd::path::path_net_area_and_speed_limited::property_t prop;
@@ -182,7 +182,6 @@ namespace hdk {
             /* there is not specified path */
             return false;
         }
-
 
         { // ---> coordinate transiform
             point2d_t waypoint_start;         // 経路点（地図座標系）
@@ -220,7 +219,7 @@ namespace hdk {
                 return true;
             }
         } // <--- coordinate transiform
-		}
+    }
 
     bool is_in_path_net( gnd::path::path_net_area_and_speed_limited &path_net, double x, double y, double expansion )
     {
@@ -250,12 +249,9 @@ namespace hdk {
         } // <--- scanning path
 
         return false;
-		}
+    }
 
-
-		bool find_waypoint( gnd::path::path_net_area_and_speed_limited &path_net,
-				double x, double y, double expansion,
-        const char *waypoint_name_destination, char *waypoint_name )
+    bool find_waypoint( gnd::path::path_net_area_and_speed_limited &path_net, double x, double y, double expansion, const char *waypoint_name_destination, char *waypoint_name )
     {
         int i, j;
         char name_i[128];
@@ -329,7 +325,7 @@ namespace hdk {
         } // <--- scanning path
 
         return true; // 到達しない．
-		}
+    }
 
     double get_path_length(gnd::path::path_net_area_and_speed_limited::path_t &path)
     {
