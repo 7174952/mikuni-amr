@@ -30,7 +30,6 @@ void pose_callback(const gnd_msgs::msg_pose2d_stamped::ConstPtr& msg)
 {
     /* update pose */
     msg_pose = *msg;
-
 }
 
 bool srv_find_callback(hdk_waypoint_finder::srv_find_waypointRequest &request,
@@ -117,7 +116,7 @@ int main(int argc, char *argv[])
     {
         ROS_ERROR("   ... Error: node name is null, you must specify the name of this node via config item \"%s\"", node_config.node_name.item.toStdString().c_str());
         return -1;
-		}
+    }
 
     // load route data file
     if( ros::ok() && node_config.path_map_file.value.at(0).size() > 0)
@@ -166,7 +165,6 @@ int main(int argc, char *argv[])
         }
     } // <--- make pose subscriber
 
-
     // ---> make service find waypoint server
     ROS_INFO(" => make service server to find waypoint");
     if( node_config.service_name_find_waypoint.value.at(0).isEmpty() )
@@ -178,7 +176,7 @@ int main(int argc, char *argv[])
     {
         ROS_INFO("    ... service name is \"%s\"", node_config.service_name_find_waypoint.value.at(0).toStdString().c_str() );
         srvserv_find_waypoint = nh.advertiseService(node_config.service_name_find_waypoint.value.at(0).toStdString().c_str(), srv_find_callback);
-		}
+    }
 
     // ---> make service is in travelable area server
     ROS_INFO(" => make service server to check specified position is in travelable area");
@@ -191,7 +189,7 @@ int main(int argc, char *argv[])
     {
         ROS_INFO("    ... service name is \"%s\"", node_config.service_name_is_in_travelable_area.value.at(0).toStdString().c_str() );
         srvserv_is_in_travelable_area = nh.advertiseService(node_config.service_name_is_in_travelable_area.value.at(0).toStdString(), srv_travelable_callback);
-		}
+    }
 
     // ---> operation
     if ( ros::ok() )
