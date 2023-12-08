@@ -1,9 +1,0 @@
-int32 First = -1
-int32 Last = -2
-int32 AllQueue = -3
-int32 Current = -4
-int32 All = -5
-
-
-int32 orderID
----
